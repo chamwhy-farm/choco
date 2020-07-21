@@ -1,3 +1,8 @@
+const log = () => {
+
+};
+
+
 const getTime = (word)=>{
     if(word.length == 0) return 0;
     const type = "dhms";
