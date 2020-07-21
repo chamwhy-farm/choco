@@ -15,5 +15,9 @@
   "bugs": {
     "url": "https://github.com/chamwhy-farm/choco/issues"
   },
-  "homepage": "https://github.com/chamwhy-farm/choco#readme"
+  "homepage": "https://github.com/chamwhy-farm/choco#readme",
+  "dependencies": {
+    "discord.js": "^12.2.0",
+    "dotenv": "^8.2.0"
+  }
 }
