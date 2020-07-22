@@ -18,6 +18,8 @@
   "homepage": "https://github.com/chamwhy-farm/choco#readme",
   "dependencies": {
     "discord.js": "^12.2.0",
-    "dotenv": "^8.2.0"
+    "dotenv": "^8.2.0",
+    "moment": "^2.27.0",
+    "winston": "^3.3.3"
   }
 }

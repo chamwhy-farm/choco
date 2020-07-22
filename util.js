@@ -1,5 +1,38 @@
-const log = () => {
+const winston = require("winston");
+const moment = require("moment");
+const fs = require("fs");
+const logDir = "./log";
 
+const log = (info) => {
+    console.log(info);
+    if (!fs.existsSync(logDir)) {
+        fs.mkdirSync(logDir);
+    }
+      
+    var logger = new (winston.Logger)({
+        transports: [
+          new (winston.transports.Console)({
+           colorize: true,
+           level: 'info',
+           timestamp: function(){             //한국 시간 나타내는법
+            return moment().format("YYYY-MM-DD HH:mm:ss");
+          }
+         }),
+          new (require('winston-daily-rotate-file'))({
+            level: 'info',
+            filename: `${logDir}/log.log`,
+            prepend: true,
+            timestamp: function(){             //한국 시간 나타내는법
+                return moment().format("YYYY-MM-DD HH:mm:ss");
+              }
+          })
+        ]
+      });
+    try{
+      logger.info(info);
+    }catch(exception){
+      logger.error("ERROR=>" +exception);
+    }
 };
 
 
@@ -31,8 +64,14 @@ const getRandomInt = (startInt, lastInt)=>{
     return Math.floor(Math.random() * (lastInt - startInt)) + startInt;
 }
 
+const getLang = () => {
+
+};
+
 module.exports = {
+    log: log,
     getTime: getTime,
     getWord: getWord,
-    getRandomInt: getRandomInt
+    getRandomInt: getRandomInt,
+    getLang: getLang
 }
