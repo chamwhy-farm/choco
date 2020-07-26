@@ -17,7 +17,7 @@ client.on('ready', () => {
 });
 
 client.on('message', msg => {
-    const word = msg.split(" ");
+    const word = msg.content.split(" ");
     if(config.callName.indexOf(word[0]) != -1){
       const lang = getLang();
     
@@ -50,8 +50,11 @@ client.on('message', msg => {
         case "attendance":
         case "ㅊㅅ":
         case "at":
-          attendanceRoute.attendance(msg);
+          const attendanceCanvas = attendanceRoute.attendance(msg, word);
+          const attachment = new Discord.MessageAttachment(attendanceCanvas.toBuffer(), 'attendance.png');
+	        msg.reply(`your attendance`, attachment);
           break;
+        
       }
     }
 });
