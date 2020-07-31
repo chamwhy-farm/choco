@@ -1,11 +1,13 @@
 const { createCanvas, loadImage } = require('canvas');
-
+const mongo = require("mongo");
+const bodyParser = require("body-parser");
 
 const moment = require("moment");
+const { isDate } = require('moment');
 
 
 
-function createRoundeBox(ctx, r, w, h, x1, y1){
+function createRoundeBox(ctx, r, w, h, x1, y1, text, textC){
     ctx.beginPath();
     ctx.arc(x1 + r, y1 + r, r, Math.PI, Math.PI*1.5, false);
     ctx.fill();
@@ -19,12 +21,20 @@ function createRoundeBox(ctx, r, w, h, x1, y1){
     ctx.arc(x1 + w - r, y1 + h - r, r, 0, Math.PI*0.5, false);
     ctx.fill();
     ctx.closePath();
+    if(text != null){
+        ctx.fillStyle = textC;
+        ctx.fillText(text, x1+w/2, y+h/2);
+    }
+}
+
+function isAttendancedDate (date, username){
+
 }
 
 const attendanceUser = (msg, word) => {
     const canvas = createCanvas(720, 620);
     const ctx = canvas.getContext('2d');
-    ctx.font = '30px Impact'
+    ctx.font = '30px Impact';
 
     ctx.fillStyle = "#55352b";
     ctx.fillRect(0, 0, 720, 620);
@@ -37,13 +47,16 @@ const attendanceUser = (msg, word) => {
     for(let i = 0; i < 7; i++){
         for(let j = 0; j < 5; j++){
             
-            
+            let text = null;
             if(j*5 + i + 1 < startOfMonth || i*5 + j + 1 > endOfMonth){
                 ctx.fillStyle = "gray";
             }else{
                 ctx.fillStyle = "white";
             }
-            createRoundeBox(ctx, 10, 80, 80, i*100+20, j*100+20+100);
+            if(){
+                text = "";
+            }
+            createRoundeBox(ctx, 10, 80, 80, i*100+20, j*100+20+100, text, "");
         }
     }
     return canvas;
