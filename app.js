@@ -35,7 +35,7 @@ client.on('message', msg => {
         case "뮤트":
         case "ㅁㅌ":
         case "뮽":
-          muteRoute.mute(msg);
+          muteRoute.mute(msg, word, client.users);
           break;
 
         case "unmute":
@@ -55,6 +55,7 @@ client.on('message', msg => {
 	        msg.reply(`your attendance`, attachment);
           break;
         
+        case "":
       }
     }
 });

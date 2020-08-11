@@ -1,5 +1,5 @@
 const { createCanvas, loadImage } = require('canvas');
-const mongo = require("mongo");
+const mongo = require("mongoose");
 const bodyParser = require("body-parser");
 
 const moment = require("moment");
@@ -23,12 +23,12 @@ function createRoundeBox(ctx, r, w, h, x1, y1, text, textC){
     ctx.closePath();
     if(text != null){
         ctx.fillStyle = textC;
-        ctx.fillText(text, x1+w/2, y+h/2);
+        ctx.fillText(text, x1+w/2, y1+h/2);
     }
 }
 
 function isAttendancedDate (date, username){
-
+    
 }
 
 const attendanceUser = (msg, word) => {
@@ -48,15 +48,16 @@ const attendanceUser = (msg, word) => {
         for(let j = 0; j < 5; j++){
             
             let text = null;
-            if(j*5 + i + 1 < startOfMonth || i*5 + j + 1 > endOfMonth){
+            const isNotDay = j*5 + i + 1 < startOfMonth || i*5 + j + 1 > endOfMonth;
+            if(isNotDay){
                 ctx.fillStyle = "gray";
             }else{
                 ctx.fillStyle = "white";
             }
-            if(){
-                text = "";
+            if(isNotDay){
+                text = 4;
             }
-            createRoundeBox(ctx, 10, 80, 80, i*100+20, j*100+20+100, text, "");
+            createRoundeBox(ctx, 10, 80, 80, i*100+20, j*100+20+100, text, "black");
         }
     }
     return canvas;

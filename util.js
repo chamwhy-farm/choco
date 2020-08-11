@@ -68,10 +68,26 @@ const getLang = () => {
 
 };
 
+const getMention = (users, mention) => {
+  if (!mention) return;
+
+	if (mention.startsWith('<@') && mention.endsWith('>')) {
+		mention = mention.slice(2, -1);
+
+		if (mention.startsWith('!')) {
+			mention = mention.slice(1);
+		}
+    const user = users.cache.get(mention);
+    if(!user) return;
+		return user;
+	}
+};
+
 module.exports = {
     log: log,
     getTime: getTime,
     getWord: getWord,
     getRandomInt: getRandomInt,
-    getLang: getLang
+    getLang: getLang,
+    getMention: getMention
 }
