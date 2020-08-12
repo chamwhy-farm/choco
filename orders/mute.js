@@ -41,7 +41,7 @@ const muteUser = async (msg, word, users) => {
 };
 
 const unmuteUser = () => {
-
+    
 };
 
 

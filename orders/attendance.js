@@ -7,7 +7,7 @@ const { isDate } = require('moment');
 
 
 
-function createRoundeBox(ctx, r, w, h, x1, y1, text, textC){
+function createRoundBox(ctx, r, w, h, x1, y1, text, textC){
     ctx.beginPath();
     ctx.arc(x1 + r, y1 + r, r, Math.PI, Math.PI*1.5, false);
     ctx.fill();
@@ -44,12 +44,19 @@ const attendanceUser = (msg, word) => {
     ctx.fillText(startOfMonth, 30, 30);
     ctx.fillText(endOfMonth, 30, 80);
 
+
+
     for(let i = 0; i < 7; i++){
         for(let j = 0; j < 5; j++){
             
             let text = null;
             const isNotDay = j*5 + i + 1 < startOfMonth || i*5 + j + 1 > endOfMonth;
             if(isNotDay){
+                if(){
+
+                }else{
+                    
+                }
                 ctx.fillStyle = "gray";
             }else{
                 ctx.fillStyle = "white";
@@ -57,9 +64,10 @@ const attendanceUser = (msg, word) => {
             if(isNotDay){
                 text = 4;
             }
-            createRoundeBox(ctx, 10, 80, 80, i*100+20, j*100+20+100, text, "black");
+            createRoundBox(ctx, 10, 80, 80, i*100+20, j*100+20+100, text, "black");
         }
     }
+
     return canvas;
 };
 
