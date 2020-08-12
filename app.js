@@ -1,5 +1,7 @@
 require('dotenv').config();
 
+const fs = require("fs");
+
 const Discord = require('discord.js');
 const client = new Discord.Client();
 const mongoose = require('mongoose');
@@ -13,7 +15,8 @@ const { getLang, getWord } = require('./util');
 const muteRoute = require('./orders/mute');
 const attendanceRoute = require('./orders/attendance');
 
-
+fs.readFileSync('./schemas')
+  .forEach(file => require(join('./schemas', file)));
 
 const db = mongoose.connection;
 db.on('error', console.error);

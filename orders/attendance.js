@@ -1,5 +1,5 @@
 const { createCanvas, loadImage } = require('canvas');
-const mongo = require("mongoose");
+const mongoose = require("mongoose");
 const bodyParser = require("body-parser");
 
 const moment = require("moment");
@@ -44,7 +44,7 @@ const attendanceUser = (msg, word) => {
     ctx.fillText(startOfMonth, 30, 30);
     ctx.fillText(endOfMonth, 30, 80);
 
-
+    const attendanceDates = User.find({userId})
 
     for(let i = 0; i < 7; i++){
         for(let j = 0; j < 5; j++){
