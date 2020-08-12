@@ -52,7 +52,7 @@ const attendanceUser = (msg, word) => {
             let text = null;
             const isNotDay = j*5 + i + 1 < startOfMonth || i*5 + j + 1 > endOfMonth;
             if(isNotDay){
-                if(){
+                if(true){
 
                 }else{
                     

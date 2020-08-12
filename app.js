@@ -5,6 +5,7 @@ const fs = require("fs");
 const Discord = require('discord.js');
 const client = new Discord.Client();
 const mongoose = require('mongoose');
+const join = require('path').join;
 
 const TOKEN = process.env.TOKEN;
 
@@ -15,7 +16,7 @@ const { getLang, getWord } = require('./util');
 const muteRoute = require('./orders/mute');
 const attendanceRoute = require('./orders/attendance');
 
-fs.readFileSync('./schemas')
+fs.readdirSync('./schemas')
   .forEach(file => require(join('./schemas', file)));
 
 const db = mongoose.connection;
@@ -46,6 +47,12 @@ client.on('message', msg => {
         case '하이':
         case '안녕하세요':
           msg.reply(getWord('인사', lang));
+          break;
+
+        case '링크':
+        case 'link':
+        case 'ㄹㅋ':
+          msg.reply('여기에 접속해서 서버에 초코를 추가할 수 있습니다\nhttps://test.test/');
           break;
         
         case 'mute':
