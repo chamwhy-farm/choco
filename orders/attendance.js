@@ -5,6 +5,8 @@ const bodyParser = require("body-parser");
 const moment = require("moment");
 const { isDate } = require('moment');
 
+const User = mongoose.model('User');
+
 
 
 function createRoundBox(ctx, r, w, h, x1, y1, text, textC){
@@ -44,7 +46,7 @@ const attendanceUser = (msg, word) => {
     ctx.fillText(startOfMonth, 30, 30);
     ctx.fillText(endOfMonth, 30, 80);
 
-    const attendanceDates = User.find({userId})
+    const attendanceDates = User.find({userId});
 
     for(let i = 0; i < 7; i++){
         for(let j = 0; j < 5; j++){

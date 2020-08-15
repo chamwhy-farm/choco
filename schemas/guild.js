@@ -20,5 +20,4 @@ const Guild = new Schema({
         promotion: Boolean
     }
 });
-
-module.exports = mongoose.model("Guild", Guild);
+mongoose.model("Guild", Guild);

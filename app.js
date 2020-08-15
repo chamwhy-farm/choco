@@ -7,6 +7,8 @@ const client = new Discord.Client();
 const mongoose = require('mongoose');
 const join = require('path').join;
 
+const models = join(__dirname, 'app/models');
+
 const TOKEN = process.env.TOKEN;
 
 require('./util');
@@ -15,9 +17,12 @@ const { getLang, getWord } = require('./util');
 
 const muteRoute = require('./orders/mute');
 const attendanceRoute = require('./orders/attendance');
+const moduleUrl = './schemas';
 
-fs.readdirSync('./schemas')
-  .forEach(file => require(join('./schemas', file)));
+require('./schemas/guild.js');
+require('./schemas/user.js');
+
+
 
 const db = mongoose.connection;
 db.on('error', console.error);
@@ -26,7 +31,13 @@ db.once('open', ()=>{
   console.log('connect to mongoose server!');
 });
 
-mongoose.connect('mongodb://localhost/discord_choco');
+
+
+mongoose.connect('mongodb://localhost/discord_choco', {
+  keepAlive: true,
+  useNewUrlParser: true,
+  useUnifiedTopology: true
+});
 
 
 

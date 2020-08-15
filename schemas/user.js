@@ -21,4 +21,4 @@ User.methods = {
     }
 };
 
-module.exports = mongoose.model("User", User);
+mongoose.model("User", User);
