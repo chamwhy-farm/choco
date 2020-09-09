@@ -1,8 +1,9 @@
 const mongoose = require("mongoose");
+const ObjectId = require("mongoose/lib/schema/objectid");
 const Schema = mongoose.Schema;
 
 const Guild = new Schema({
-    gName: String,
+    gID: {type: Number, required: true},
     mute: {
         choco: [Number],
         msg: [Number],
@@ -15,9 +16,9 @@ const Guild = new Schema({
 
     },
     set: {
-        lang: Number,
+        lang: {type: String, default: "eng"},
         isPro: Boolean,
         promotion: Boolean
-    }
+    },
 });
-mongoose.model("Guild", Guild);
+module.exports = mongoose.model("Guild", Guild);

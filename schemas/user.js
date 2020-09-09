@@ -1,24 +1,33 @@
 const mongoose = require("mongoose");
+const ObjectId = require("mongoose/lib/schema/objectid");
 const Schema = mongoose.Schema;
 
 const User = new Schema({
-    username: {type: String, default: 'noob', trim: true, maxlength: 10},
+    userID: {type: String, required: true},
     choco: {
-        choco: {type: Number, required: true},
+        choco: {type: Number, required: true, default: 1000},
         game: {
-            wins: Number,
-            loses: Number,
+            wins: {type: Number, default: 0},
+            loses: {type: Number, default: 0},
         },
         
     },
-    attendance: [[Number],],
+    attendance: [{type: Date},],
     createdAt: {type: Date, default: Date.now }
 });
 
 User.methods = {
     getChoco: function(){
         return this.choco.choco;
+    },
+    addChoco: function(choco){
+        this.choco += choco;
+        
+    },
+    addAttend: function(date){
+        this.attendance.push(date);
+        
     }
 };
 
-mongoose.model("User", User);
+module.exports = mongoose.model('User', User);

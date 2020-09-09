@@ -5,72 +5,88 @@ const bodyParser = require("body-parser");
 const moment = require("moment");
 const { isDate } = require('moment');
 
-const User = mongoose.model('User');
+const { createRoundBox, createUser } = require('../util');
+
+const User = require("../schemas/user");
+
+const config = require('../config.json');
 
 
 
-function createRoundBox(ctx, r, w, h, x1, y1, text, textC){
-    ctx.beginPath();
-    ctx.arc(x1 + r, y1 + r, r, Math.PI, Math.PI*1.5, false);
-    ctx.fill();
-    ctx.fillRect(x1 + r, y1, w - 2*r, r);
-    ctx.arc(x1 + w - r, y1 + r, r, Math.PI*1.5, Math.PI*2, false);
-    ctx.fill();
-    ctx.fillRect(x1, y1 + r, w, h - 2*r);
-    ctx.arc(x1 + r, y1 + h - r, r, Math.PI*0.5, Math.PI*1, false);
-    ctx.fill();
-    ctx.fillRect(x1 + r, y1 + h - r, w - 2*r, r);
-    ctx.arc(x1 + w - r, y1 + h - r, r, 0, Math.PI*0.5, false);
-    ctx.fill();
-    ctx.closePath();
-    if(text != null){
-        ctx.fillStyle = textC;
-        ctx.fillText(text, x1+w/2, y1+h/2);
+
+const attendanceUser = async (msg, word) => {
+
+    let user = await User.findOne({userID: msg.author.id});
+    if(!user){
+        user = await createUser(msg.author.id); 
     }
-}
+    user.attendance = [];
+    if(user.attendance.indexOf(moment().startOf('date').toDate()) != -1){
+        msg.reply("이미 출석하셨습니다.");
+        return;
+    }
 
-function isAttendancedDate (date, username){
-    
-}
+    //user 수정
+    user.addAttend(moment().startOf('date').toDate());
+    user.addChoco(50);
+    user.save();
 
-const attendanceUser = (msg, word) => {
-    const canvas = createCanvas(720, 620);
+
+    console.log(user.attendance);
+    console.log(moment().startOf('date').toDate() + "");
+    const canvas = createCanvas(720, 720);
     const ctx = canvas.getContext('2d');
     ctx.font = '30px Impact';
 
     ctx.fillStyle = "#55352b";
-    ctx.fillRect(0, 0, 720, 620);
+    ctx.fillRect(0, 0, 720, 720);
     const startOfMonth = moment().startOf('month').day()+1;
     const endOfMonth   = moment().endOf('month').day() + 29;
     ctx.fillStyle = "white";
     ctx.fillText(startOfMonth, 30, 30);
     ctx.fillText(endOfMonth, 30, 80);
 
-    const attendanceDates = User.find({userId});
-
+    
     for(let i = 0; i < 7; i++){
-        for(let j = 0; j < 5; j++){
+        for(let j = 0; j < 6; j++){
             
             let text = null;
-            const isNotDay = j*5 + i + 1 < startOfMonth || i*5 + j + 1 > endOfMonth;
+            const isNotDay = j*7 + i + 1 < startOfMonth || j*7 + i + 1 - startOfMonth > endOfMonth;
+            const thisDay = moment().add(j*7 + i + 2 - startOfMonth - moment().date(), 'days').toDate();;
+            
             if(isNotDay){
-                if(true){
-
-                }else{
-                    
-                }
                 ctx.fillStyle = "gray";
             }else{
-                ctx.fillStyle = "white";
+                if(user.attendance.indexOf(thisDay) != -1){
+                    ctx.fillStyle = config.color;
+                }else{
+                    ctx.fillStyle = "white";
+                }
+                
             }
-            if(isNotDay){
-                text = 4;
+            let textColor;
+            if(user.attendance.indexOf(thisDay) != -1){
+                text = "";
+            }else{
+                if(isNotDay){
+                    if(j*7 + i + 1 < startOfMonth){
+                        text = j*7 + i + 1 - startOfMonth + moment().add(-1, 'months').endOf('month').date();
+                    }else{
+                        text = j*7 + i + 1 - startOfMonth - endOfMonth;
+                    }
+                    textColor = "darkgray";
+                }else{
+                    text = j*7 + i + 2 - startOfMonth;
+                    textColor = config.color;
+                }
             }
-            createRoundBox(ctx, 10, 80, 80, i*100+20, j*100+20+100, text, "black");
+            
+            createRoundBox(ctx, 10, 80, 80, i*100+20, j*100+20+100, text, textColor);
         }
     }
 
-    return canvas;
+    const answer = `${50}초코를 획득하셨습니다!`;
+    return {canvas: canvas, answer: answer};
 };
 
 
