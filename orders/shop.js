@@ -9,6 +9,12 @@ const shop = (msg) => {
     
 };
 
+const buy = (msg) => {
+    const canvas = createCanvas(800, 200);
+    const ctx = canvas.getContext('2d');
+    return canvas;
+};
+
 const getChoco = async (msg) => {
     let user = await User.findOne({userID: msg.author.id});
     if(!user){

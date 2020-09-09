@@ -21,6 +21,7 @@ const attendanceRoute = require('./orders/attendance');
 const channelRoute = require('./orders/channels');
 const shopRoute = require('./orders/shop');
 const projectRoute = require('./orders/project');
+const questionRoute = require('./orders/question');
 
 const moduleUrl = './schemas';
 
@@ -38,7 +39,7 @@ db.once('open', ()=>{
   console.log('connect to mongoose server!');
 });
 
-
+ 
 
 mongoose.connect('mongodb://localhost/discord_choco', {
   keepAlive: true,
@@ -136,7 +137,8 @@ client.on('message', async msg => {
           const usersChoco = await shopRoute.getChoco(msg);
           const chocoCanvas = createCanvas(900, 300);
           const chocoCtx = chocoCanvas.getContext('2d');
-          util.createRoundBox(chocoCtx, 80, 900, 300, 0, 0, usersChoco, 'gray');
+          chocoCtx.font = "100px Impact";
+          util.createRoundBox(chocoCtx, 40, 900, 300, 0, 0, usersChoco, 'gray');
           const chocoment = new Discord.MessageAttachment(chocoCanvas.toBuffer(), `${msg.author.username}_choco.png`);
           msg.reply(`초코는 출석, 대답, 게임, 이벤트 등으로 얻을 수 있습니다`, chocoment);
           break;
@@ -144,6 +146,21 @@ client.on('message', async msg => {
         case "작품신청":
         case "ㅈㅍㅅㅊ":
           projectRoute.askAddingProject(msg, word);
+          break;
+
+        case "상점":
+        case "시장":
+        case "market":
+          shopRoute.shop(msg);
+          break;
+
+        case "구입":
+        case "구매":
+        case "ㄱㅁ":
+        case "내놔":
+          const {buyCanvas, itemName} = shopRoute.buy(msg);
+          const buyment = new Discord.MessageAttachment(buyCanvas.toBuffer(), 'item.png');
+          msg.reply(`${itemName}을 구매했습니다`, buyment);
           break;
       }
     }
