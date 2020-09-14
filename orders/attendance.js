@@ -15,10 +15,9 @@ const config = require('../config.json');
 
 
 const attendanceUser = async (msg, word) => {
-
     let user = await User.findOne({userID: msg.author.id});
     if(!user){
-        user = await createUser(msg.author.id); 
+        user = await createUser(msg.author.id);
     }
     user.attendance = [];
     if(user.attendance.indexOf(moment().startOf('date').toDate()) != -1){
@@ -86,7 +85,7 @@ const attendanceUser = async (msg, word) => {
     }
 
     const answer = `${50}초코를 획득하셨습니다!`;
-    return {canvas: canvas, answer: answer};
+    return {attendanceCanvas: canvas, answer: answer};
 };
 
 

@@ -21,7 +21,7 @@ User.methods = {
         return this.choco.choco;
     },
     addChoco: function(choco){
-        this.choco += choco;
+        this.choco.choco += choco * 1;
         
     },
     addAttend: function(date){

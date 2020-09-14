@@ -114,7 +114,7 @@ client.on('message', async msg => {
         case 'attendance':
         case 'ㅊㅅ':
         case 'at':
-          const attendanceCanvas = await attendanceRoute.attendance(msg, word);
+          const {attendanceCanvas, answer} = await attendanceRoute.attendance(msg, word);
           const attachment = new Discord.MessageAttachment(attendanceCanvas.toBuffer(), 'attendance.png');
 	        msg.reply(`your attendance`, attachment);
           break;
