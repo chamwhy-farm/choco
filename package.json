@@ -1,7 +1,6 @@
 {
   "name": "choco",
   "version": "1.0.0",
-  "description": "",
   "main": "app.js",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1"
@@ -17,6 +16,7 @@
   },
   "homepage": "https://github.com/chamwhy-farm/choco#readme",
   "dependencies": {
+    "bcrypt": "^5.0.0",
     "body-parser": "^1.19.0",
     "canvas": "^2.6.1",
     "discord.js": "^12.2.0",
@@ -24,5 +24,7 @@
     "moment": "^2.27.0",
     "mongoose": "^5.9.26",
     "winston": "^3.3.3"
-  }
+  },
+  "devDependencies": {},
+  "description": ""
 }

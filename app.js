@@ -39,9 +39,9 @@ db.once('open', ()=>{
   console.log('connect to mongoose server!');
 });
 
- 
+const url = `mongodb+srv://chamwhy:${process.env.password}@cluster0.vqljg.mongodb.net/<dbname>?retryWrites=true&w=majority`;
 
-mongoose.connect('mongodb://localhost/discord_choco', {
+mongoose.connect(url, {
   keepAlive: true,
   useNewUrlParser: true,
   useUnifiedTopology: true
