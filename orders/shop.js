@@ -12,7 +12,7 @@ const shop = (msg) => {
 const buy = (msg) => {
     const canvas = createCanvas(800, 200);
     const ctx = canvas.getContext('2d');
-    return canvas;
+    return {buyCanvas: canvas, itemName: 'test'};
 };
 
 const getChoco = async (msg) => {
