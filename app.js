@@ -39,7 +39,7 @@ db.once('open', ()=>{
   console.log('connect to mongoose server!');
 });
 
-const url = `mongodb%2Bsrv%3A%2F%2Fchamwhy%3A${process.env.password}%40choco.vqljg.mongodb.net%2Fchoco%3FretryWrites%3Dtrue%26w%3Dmajority`;
+const url = `mongodb+srv://chamwhy:${process.env.password}@choco.vqljg.mongodb.net/choco?retryWrites=true&w=majority`;
 
 mongoose.connect(url, {
   keepAlive: true,
