@@ -90,7 +90,8 @@ client.on('message', async msg => {
         case '헬로':
         case '하이':
         case '안녕하세요':
-          msg.reply(getWord('인사', lang));
+          msg.reply("헤헤");
+          //msg.reply(getWord('인사', lang));
           break;
 
         case "마스터":

@@ -17,13 +17,14 @@ const config = require('../config.json');
 const attendanceUser = async (msg, word) => {
     let user = await User.findOne({userID: msg.author.id});
     if(!user){
+        console.log("create new user! name: " + msg.author.username);
         user = await createUser(msg.author.id);
     }
-    user.attendance = [];
     if(user.attendance.indexOf(moment().startOf('date').toDate()) != -1){
         msg.reply("이미 출석하셨습니다.");
         return;
     }
+    console.log(user.attendance);
 
     //user 수정
     user.addAttend(moment().startOf('date').toDate());
@@ -32,7 +33,7 @@ const attendanceUser = async (msg, word) => {
 
 
     console.log(user.attendance);
-    console.log(moment().startOf('date').toDate() + "");
+    console.log(moment().startOf('date').toDate());
     const canvas = createCanvas(720, 720);
     const ctx = canvas.getContext('2d');
     ctx.font = '30px Impact';

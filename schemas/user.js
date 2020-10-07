@@ -16,7 +16,7 @@ const User = new Schema({
     createdAt: {type: Date, default: Date.now }
 });
 
-User.methods = {
+User.statics = {
     getChoco: function(){
         return this.choco.choco;
     },
@@ -25,8 +25,7 @@ User.methods = {
         
     },
     addAttend: function(date){
-        this.attendance.push(date);
-        
+        this.attendance = this.attendance.push(date);
     }
 };
 
