@@ -34,6 +34,7 @@ const attendanceUser = async (msg, word) => {
 
     console.log(user.attendance);
     console.log(moment().startOf('date').toDate());
+    console.log(new Date());
     const canvas = createCanvas(720, 720);
     const ctx = canvas.getContext('2d');
     ctx.font = '30px Impact';
