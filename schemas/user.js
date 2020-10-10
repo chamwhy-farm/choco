@@ -12,7 +12,7 @@ const User = new Schema({
         },
         
     },
-    attendance: [{type: Date},],
+    attendance: [{type: Number},],
     createdAt: {type: Date, default: Date.now }
 });
 

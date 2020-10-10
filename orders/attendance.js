@@ -20,20 +20,23 @@ const attendanceUser = async (msg, word) => {
         console.log("create new user! name: " + msg.author.username);
         user = await createUser(msg.author.id);
     }
-    if(user.attendance.indexOf(moment().startOf('day').toDate()) != -1){
+    if(user.attendance.indexOf(moment().startOf('day').toDate().getTime()) != -1){
         msg.reply("이미 출석하셨습니다.");
-        return;
+        return {
+            attendanceCanvas: null,
+            answer: null
+        };
     }
     console.log(user.attendance);
 
     //user 수정
-    user.addAttend(moment().startOf('day').toDate());
+    user.addAttend(moment().startOf('day').toDate().getTime());
     user.addChoco(50);
     user.save();
 
 
     console.log(user.attendance);
-    console.log(moment().startOf('day').toDate());
+    console.log(moment().startOf('day').toDate().getTime());
     console.log(new Date());
     const canvas = createCanvas(720, 720);
     const ctx = canvas.getContext('2d');
@@ -53,8 +56,8 @@ const attendanceUser = async (msg, word) => {
             
             let text = null;
             const isNotDay = j*7 + i + 1 < startOfMonth || j*7 + i + 1 - startOfMonth > endOfMonth;
-            const thisDay = moment().add(j*7 + i + 2 - startOfMonth - moment().date(), 'days').toDate();;
-            
+            const thisDay = moment().startOf('date').add(j*7 + i + 2 - startOfMonth - moment().date(), 'days').toDate().getTime();
+            console.log(thisDay);
             if(isNotDay){
                 ctx.fillStyle = "gray";
             }else{
@@ -83,6 +86,13 @@ const attendanceUser = async (msg, word) => {
             }
             
             createRoundBox(ctx, 10, 80, 80, i*100+20, j*100+20+100, text, textColor);
+            ctx.closePath();
+            ctx.moveTo(i*100+20, j*100+120);
+            ctx.beginPath();
+            ctx.fillStyle = "#55352b";
+            ctx.arc(i*100+60, j*100+160, 30, 0, Math.PI*2);
+            ctx.fill();
+            ctx.closePath();
         }
     }
 

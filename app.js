@@ -125,8 +125,9 @@ client.on('message', async msg => {
         case 'ㅊㅅ':
         case 'at':
           const {attendanceCanvas, answer} = await attendanceRoute.attendance(msg, word);
+          if(attendanceCanvas == null) return;
           const attachment = new Discord.MessageAttachment(attendanceCanvas.toBuffer(), 'attendance.png');
-	        msg.reply(`your attendance`, attachment);
+	        msg.reply(answer, attachment);
           break;
         
         case '채널삭제':
