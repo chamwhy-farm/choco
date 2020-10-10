@@ -20,20 +20,20 @@ const attendanceUser = async (msg, word) => {
         console.log("create new user! name: " + msg.author.username);
         user = await createUser(msg.author.id);
     }
-    if(user.attendance.indexOf(moment().startOf('date').toDate()) != -1){
+    if(user.attendance.indexOf(moment().startOf('day').toDate()) != -1){
         msg.reply("이미 출석하셨습니다.");
         return;
     }
     console.log(user.attendance);
 
     //user 수정
-    user.addAttend(moment().startOf('date').toDate());
+    user.addAttend(moment().startOf('day').toDate());
     user.addChoco(50);
     user.save();
 
 
     console.log(user.attendance);
-    console.log(moment().startOf('date').toDate());
+    console.log(moment().startOf('day').toDate());
     console.log(new Date());
     const canvas = createCanvas(720, 720);
     const ctx = canvas.getContext('2d');
