@@ -145,9 +145,9 @@ client.on('message', async msg => {
         case "초코":
         case "choco":
         case "cc":
-          const {can, text} = await shopRoute.getChoco(msg);
-          const chocoment = new Discord.MessageAttachment(can.toBuffer(), `${msg.author.username}_choco.png`);
-          msg.reply(text, chocoment);
+          const {chococan, chocotext} = await shopRoute.getChoco(msg);
+          const chocoment = new Discord.MessageAttachment(chococan.toBuffer(), `${msg.author.username}_choco.png`);
+          msg.reply(chocotext, chocoment);
           break;
 
         case "레벨":
@@ -158,6 +158,7 @@ client.on('message', async msg => {
           const lvment = new Discord.MessageAttachment(lvcan.toBuffer(), `${msg.author.username}_lv.png`);
           msg.reply(lvtext, lvment);
           break;
+          
         case "작품신청":
         case "ㅈㅍㅅㅊ":
           projectRoute.askAddingProject(msg, word);
