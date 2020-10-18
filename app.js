@@ -145,15 +145,19 @@ client.on('message', async msg => {
         case "초코":
         case "choco":
         case "cc":
-          const usersChoco = await shopRoute.getChoco(msg);
-          const chocoCanvas = createCanvas(900, 300);
-          const chocoCtx = chocoCanvas.getContext('2d');
-          chocoCtx.font = "100px Impact";
-          util.createRoundBox(chocoCtx, 40, 900, 300, 0, 0, usersChoco, 'gray');
-          const chocoment = new Discord.MessageAttachment(chocoCanvas.toBuffer(), `${msg.author.username}_choco.png`);
-          msg.reply(`초코는 출석, 대답, 게임, 이벤트 등으로 얻을 수 있습니다`, chocoment);
+          const {can, text} = await shopRoute.getChoco(msg);
+          const chocoment = new Discord.MessageAttachment(can.toBuffer(), `${msg.author.username}_choco.png`);
+          msg.reply(text, chocoment);
           break;
 
+        case "레벨":
+        case "렙":
+        case "lv":
+        case "level":
+          const {lvcan, lvtext} = await shopRoute.getLv(msg);
+          const lvment = new Discord.MessageAttachment(lvcan.toBuffer(), `${msg.author.username}_lv.png`);
+          msg.reply(lvtext, lvment);
+          break;
         case "작품신청":
         case "ㅈㅍㅅㅊ":
           projectRoute.askAddingProject(msg, word);

@@ -10,10 +10,12 @@ const muteUser = async (msg, word, users) => {
     } 
     const user = getMention(users, word[0]);
     if(!user){
-        msg.reply("형식에 알맞게 입력해주세욧");
+        msg.reply("형식에 알맞게 입력해주세욧"); 
         msg.reply("```"+word[0]+"```");
         return;
     } 
+     
+    console.log(word[0]);
     let muteRole = msg.guild.roles.cache.find(role => role.name === "mute");
     if(!muteRole) {
         await msg.guild.roles.create({
@@ -26,18 +28,21 @@ const muteUser = async (msg, word, users) => {
         });
         muteRole = msg.guild.roles.cache.find(role => role.name === "mute");
     }
-    const muteUserTag = msg.guild.members.cache.find(user => user.id == msg.author.id);
     if(word.length > 1){
-        const ms = getTime(word.slice(1));
+        const ms = getTime(word.slice(1)); 
         if(!ms){
             msg.reply("형식에 알맞게 입력해주세요");
             return;
         }
+        console.log("nooooo\n" + user);
+        user.roles.add(muteRole);
         setTimeout(()=>{
-            muteUserTag.roles.remove(muteRole);
+            user.roles.remove(muteRole);
+            
         }, ms);
+    }else{
+        user.roles.add(muteRole);
     }
-    muteUserTag.roles.add(muteRole);
     msg.reply("뮤트 완료하였습니다");
 };
 
@@ -65,9 +70,7 @@ const unmuteUser = async (msg, word, users) => {
         });
         muteRole = msg.guild.roles.cache.find(role => role.name === "mute");
     }
-    const muteUserTag = msg.guild.members.cache.find(user => user.id == msg.author.id);
-    
-    muteUserTag.roles.remove(muteRole);
+    user.roles.remove(muteRole);
     msg.reply("언뮤트 완료하였습니다");
 };
 

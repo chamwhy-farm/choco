@@ -98,7 +98,8 @@ const getMention = (users, mention) => {
 		}
     const user = users.cache.get(mention);
     if(!user) return;
-		return user;
+    console.log("user get success");
+		return user; 
 	}
 };
 
