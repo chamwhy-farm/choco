@@ -2,6 +2,7 @@ const { createCanvas, loadImage } = require('canvas');
 const { createRoundBox, createUser } = require('../util');
 
 const User = require("../schemas/user");
+const { config } = require('winston');
 
 const shop = (msg) => {
     const canvas = createCanvas(800, 600);
@@ -12,7 +13,24 @@ const shop = (msg) => {
 const buy = (msg) => {
     const canvas = createCanvas(800, 200);
     const ctx = canvas.getContext('2d');
-    return {buyCanvas: canvas, itemName: 'test'};
+
+    let user = await User.findOne({userID: msg.author.id});
+    if(!user){
+        console.log("create new user! name: " + msg.author.username);
+        user = await createUser(msg.author.id);
+    }
+
+    const itemName;
+    const itemCnt;
+    const lastChoco = user.addItem(itemName, itemCnt);
+    if(lastChoco != null){
+        
+    }else{
+        msg.reply("초코가 부족합니다");
+    }
+
+
+    
 };
 
 const getChoco = async (msg) => {
