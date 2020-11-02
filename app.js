@@ -29,6 +29,7 @@ const Guild = require('./schemas/guild.js');
 const User = require('./schemas/user.js');
 const user = require('./schemas/user.js');
 const util = require('./util');
+const { discriminator } = require('./schemas/guild.js');
 
 
 
@@ -64,11 +65,53 @@ function isChocoUser(msg)
   User.findById
 }
 
+const invites = {};
+
+// A pretty useful method to create a delay without blocking the whole script.
+const wait = require('util').promisify(setTimeout);
 
 
-client.on('ready', () => {
+
+client.on('ready', async () => {
   console.log(`Logged in as ${client.user.tag}!`);
+  // "ready" isn't really ready. We need to wait a spell.
+  await wait(1000);
+
+  // Load all invites for all guilds and save them to the cache.
+  client.guilds.cache.forEach(g => {
+    g.fetchInvites().then(guildInvites => {
+      invites[g.id] = guildInvites;
+    });
+  });
 });
+
+
+client.on('guildMemberAdd', async (member) => {
+  // To compare, we need to load the current invite list.
+  member.guild.fetchInvites().then(async (guildInvites) => {
+    // This is the *existing* invites for the guild.
+    const ei = invites[member.guild.id];
+    // Update the cached invites for the guild.
+    invites[member.guild.id] = guildInvites;
+    // Look through the invites, find the one for which the uses went up.
+    const invite = guildInvites.find(i => ei.get(i.code).uses < i.uses);
+    // This is just to simplify the message being sent below (inviter doesn't have a tag property)
+    const inviter = client.users.get(invite.inviter.id);
+    // Get the log channel (change to your liking)
+    const logChannel = member.guild.channels.cache.find(channel => channel.name === "대문");
+
+    let user = await User.findOne({userID: inviter.id});
+    if(!user){
+        console.log("create new user! name: " + msg.author.username);
+        user = await createUser(msg.author.id);
+    }
+    user.addChoco(100);
+    // A real basic message with the information we need. 
+    logChannel.send(`환영합니다 ${member.user.tag}님. \`${inviter.tag} +100\``);
+  });
+});
+
+
 
 client.on('message', async msg => {
   
@@ -167,7 +210,7 @@ client.on('message', async msg => {
         case "상점":
         case "시장":
         case "market":
-          shopRoute.shop(msg);
+          shopRoute.shop(msg, Discord.MessageAttachment);
           break;
 
         case "구입":
@@ -177,6 +220,20 @@ client.on('message', async msg => {
           const {buyCanvas, itemName} = shopRoute.buy(msg);
           const buyment = new Discord.MessageAttachment(buyCanvas.toBuffer(), 'item.png');
           msg.reply(`${itemName}을 구매했습니다`, buyment);
+          break;
+
+        case "invite":
+        case "초대":
+        case "ㅊㄷ":
+          const invites = await msg.guild.fetchInvites();
+          console.log(invites);
+          invites.forEach(invite => {
+            const {uses, inviter} = invite;
+            const { username, discriminator } = inviter;
+            const name = `${username}#${discriminator}`;
+            console.log(invite);
+            msg.reply(name, uses);
+          });
           break;
       }
     }

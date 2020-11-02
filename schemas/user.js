@@ -5,6 +5,7 @@ const Schema = mongoose.Schema;
 
 const User = new Schema({
     userID: {type: String, required: true},
+    lv: {type: Number, required: true, default: 1},
     choco: {
         choco: {type: Number, required: true, default: 1000},
         game: {
@@ -21,6 +22,12 @@ const User = new Schema({
 User.methods = {
     getChoco: function(){
         return this.choco.choco;
+    },
+    getLv: function(){
+        if(this.choco.lv == undefined){
+            this.choco.lv = 1;
+        }
+        return this.choco.lv;
     },
     addChoco: function(choco){
         this.choco.choco += choco * 1;

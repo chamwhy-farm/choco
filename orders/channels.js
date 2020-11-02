@@ -29,7 +29,8 @@ const delCh = (msg, word) => {
     }
 };
 
+
 module.exports = {
     setChMas: setChMas,
-    delCh: delCh
+    delCh: delCh,
 }
