@@ -210,7 +210,7 @@ client.on('message', async msg => {
         case "상점":
         case "시장":
         case "market":
-          shopRoute.shop(msg, Discord.MessageAttachment);
+          shopRoute.shop(msg, Discord.MessageEmbed);
           break;
 
         case "구입":

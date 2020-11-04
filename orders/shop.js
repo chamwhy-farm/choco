@@ -9,13 +9,20 @@ const config = require('../config.json');
 
 
 function getProduct(product){
-    console.log(product);
+    return `(${config.shop[product].index + 1})  <${product}>  [ ${config.shop[product].price} ]\n`;
 }
 
 const shop = (msg) => {
+    let fields = "";
     for(product in config.shop){
-        getProduct(product);
+        fields += getProduct(product);
     }
+    let said = "";
+    const types = ["autohotkey", "bash", "coffeescript", "cpp", "cs", "css", "diff", "glsl", "md", "ml", "prolog", "py", "xl", "xml"];
+    for(type in types){
+        said += "```" + `${types[type]}\n` + fields + "\n```\n";
+    }
+    msg.reply(said);
 };
 
 const buy = async (msg) => {
@@ -50,12 +57,12 @@ const getChoco = async (msg) => {
     const chocoCtx = chocoCanvas.getContext('2d');
 
     chocoCtx.save();
-    chocoCtx.font = "100px Impact";
+    chocoCtx.font = "100px Impact, segoe-ui-emoji";
     chocoCtx.fillStyle = "#1a1a1a";
 
     createRoundBox(chocoCtx, 40, 900, 300, 0, 0, null, null);
     chocoCtx.fillStyle = "white";
-    chocoCtx.font = 'bold 60px sans-serif';
+    chocoCtx.font = 'bold 60px sans-serif, segoe-ui-emoji';
     chocoCtx.textBaseline = "middle";
     let username;
     if(msg.author.username.length > 14){
@@ -67,7 +74,7 @@ const getChoco = async (msg) => {
     chocoCtx.fillStyle = "#0e0d0c";
     createRoundBox(chocoCtx, 10, 300, 80, 330, 170, null, null);
     chocoCtx.fillStyle = "#cccccc";
-    chocoCtx.font = "50px sans-serif";
+    chocoCtx.font = "50px sans-serif, segoe-ui-emoji";
     chocoCtx.fillText(usersChoco, 350, 210);
     chocoCtx.beginPath();
 	// Start the arc to form a circle
@@ -83,7 +90,7 @@ const getChoco = async (msg) => {
     chocoCtx.restore();
     chocoCtx.fillStyle = "#4a423e";
     console.log(userLV);
-    chocoCtx.font = "bold 40px sans-serif";
+    chocoCtx.font = "bold 40px sans-serif, segoe-ui-emoji";
     createRoundBox(chocoCtx, 40, 80, 80, 190, 190, userLV, "white");
     
     return {chococan: chocoCanvas, chocotext: `초코는 상점에서 이용이 가능합니다`};
