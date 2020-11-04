@@ -86,7 +86,9 @@ client.on('ready', async () => {
 });
 
 
-client.on('guildMemberAdd', async (member) => {
+client.on('guildMemberAdd', async member => {
+  console.log('a user added');
+  member.guild.channels.cache.find(channel => channel.name === "대문").send("들어오셨습니다");
   // To compare, we need to load the current invite list.
   member.guild.fetchInvites().then(async (guildInvites) => {
     // This is the *existing* invites for the guild.

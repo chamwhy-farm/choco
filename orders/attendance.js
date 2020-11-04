@@ -40,7 +40,7 @@ const attendanceUser = async (msg, word) => {
     console.log(new Date());
     const canvas = createCanvas(720, 720);
     const ctx = canvas.getContext('2d');
-    ctx.font = '30px Impact';
+    ctx.font = '30px Impact, segoe-ui-emoji';
 
     ctx.fillStyle = config.color;
     ctx.fillRect(0, 0, 720, 720);
