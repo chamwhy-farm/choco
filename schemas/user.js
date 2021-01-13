@@ -3,9 +3,12 @@ const ObjectId = require("mongoose/lib/schema/objectid");
 const { config } = require("winston");
 const Schema = mongoose.Schema;
 
+const configjson = require("../config.json");
+
 const User = new Schema({
     userID: {type: String, required: true},
     lv: {type: Number, required: true, default: 1},
+    lank: {type: String, required: true, default: "muggle"},
     choco: {
         choco: {type: Number, required: true, default: 1000},
         game: {
@@ -28,6 +31,20 @@ User.methods = {
             this.choco.lv = 1;
         }
         return this.choco.lv;
+    },
+    getLank: function(){
+        if(this.choco.lank == undefined){
+            const lankList = configjson.lank;
+            let key;
+            for(key in lankList){
+                if(lankList[key] != -1 && this.choco.lv > lankList[key]){
+                    break;
+                }
+            }
+            this.choco.lank = key;
+
+        }
+        return this.choco.lank;
     },
     addChoco: function(choco){
         this.choco.choco += choco * 1;

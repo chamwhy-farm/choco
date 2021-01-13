@@ -14,7 +14,7 @@ const TOKEN = process.env.TOKEN;
 
 require('./util');
 const config = require('./config.json');
-const { getLang, getWord, isMaster } = require('./util');
+const { getLang, getWord, isMaster, createUser, getRandomInt } = require('./util');
 
 const muteRoute = require('./orders/mute');
 const attendanceRoute = require('./orders/attendance');
@@ -73,16 +73,18 @@ const wait = require('util').promisify(setTimeout);
 
 
 client.on('ready', async () => {
-  console.log(`Logged in as ${client.user.tag}!`);
-  // "ready" isn't really ready. We need to wait a spell.
-  await wait(1000);
+  // console.log(`Logged in as ${client.user.tag}!`);
+  // // "ready" isn't really ready. We need to wait a spell.
+  // await wait(1000);
 
-  // Load all invites for all guilds and save them to the cache.
-  client.guilds.cache.forEach(g => {
-    g.fetchInvites().then(guildInvites => {
-      invites[g.id] = guildInvites;
-    });
-  });
+  // // Load all invites for all guilds and save them to the cache.
+  // client.guilds.cache.forEach(g => {
+  //   g.fetchInvites().then(guildInvites => {
+  //     invites[g.id] = guildInvites;
+  //   });
+  // });
+  console.log("문제 내줌");
+  await wait(getRandomInt(36000000, 144000000));
 });
 
 
@@ -101,7 +103,7 @@ client.on('guildMemberAdd', async member => {
     const inviter = client.users.get(invite.inviter.id);
     // Get the log channel (change to your liking)
     const logChannel = member.guild.channels.cache.find(channel => channel.name === "대문");
-
+    if(!logChannel) return;
     let user = await User.findOne({userID: inviter.id});
     if(!user){
         console.log("create new user! name: " + msg.author.username);
@@ -141,7 +143,11 @@ client.on('message', async msg => {
 
         case "마스터":
         case "주인":
-          msg.reply(isMaster(msg));
+          if(isMaster(msg)){
+            msg.reply("네, 주인님");
+          }else{
+            msg.reply("누구신가요?");
+          }
           break;
 
         case '링크':
@@ -168,7 +174,7 @@ client.on('message', async msg => {
         case 'attend':
         case 'attendance':
         case 'ㅊㅅ':
-        case 'at':
+        case 'ct':
           const {attendanceCanvas, answer} = await attendanceRoute.attendance(msg, word);
           if(attendanceCanvas == null) return;
           const attachment = new Discord.MessageAttachment(attendanceCanvas.toBuffer(), 'attendance.png');
@@ -194,39 +200,31 @@ client.on('message', async msg => {
           const chocoment = new Discord.MessageAttachment(chococan.toBuffer(), `${msg.author.username}_choco.png`);
           msg.reply(chocotext, chocoment);
           break;
-
-        case "레벨":
-        case "렙":
-        case "lv":
-        case "level":
-          const {lvcan, lvtext} = await shopRoute.getLv(msg);
-          const lvment = new Discord.MessageAttachment(lvcan.toBuffer(), `${msg.author.username}_lv.png`);
-          msg.reply(lvtext, lvment);
-          break;
           
         case "작품신청":
         case "ㅈㅍㅅㅊ":
           projectRoute.askAddingProject(msg, word);
           break;
 
-        case "상점":
-        case "시장":
-        case "market":
-          shopRoute.shop(msg, Discord.MessageEmbed);
-          break;
+        // case "상점":
+        // case "시장":
+        // case "market":
+        //   shopRoute.shop(msg, Discord.MessageEmbed);
+        //   break;
 
-        case "구입":
-        case "구매":
-        case "ㄱㅁ":
-        case "내놔":
-          const {buyCanvas, itemName} = shopRoute.buy(msg);
-          const buyment = new Discord.MessageAttachment(buyCanvas.toBuffer(), 'item.png');
-          msg.reply(`${itemName}을 구매했습니다`, buyment);
-          break;
+        // case "구입":
+        // case "구매":
+        // case "ㄱㅁ":
+        // case "내놔":
+        //   const {buyCanvas, itemName} = shopRoute.buy(msg);
+        //   const buyment = new Discord.MessageAttachment(buyCanvas.toBuffer(), 'item.png');
+        //   msg.reply(`${itemName}을 구매했습니다`, buyment);
+        //   break;
 
         case "invite":
         case "초대":
         case "ㅊㄷ":
+
           const invites = await msg.guild.fetchInvites();
           console.log(invites);
           invites.forEach(invite => {
@@ -234,7 +232,7 @@ client.on('message', async msg => {
             const { username, discriminator } = inviter;
             const name = `${username}#${discriminator}`;
             console.log(invite);
-            msg.reply(name, uses);
+            // msg.reply(name, uses);
           });
           break;
       }

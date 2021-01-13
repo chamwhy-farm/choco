@@ -2,6 +2,26 @@
     "callName": ["choco", "초코", "초코야", "초", "cho", "촠"],
     "color": "#55352b",
     "whiteColor": "#b27866",
+    "lank": {
+        "master": -1,
+        "mage": -1,
+        "teacher": -1,
+        "senior": 20,
+        "junior": 12,
+        "sophomore": 7,
+        "freshman": 3,
+        "muggle": 0
+    },
+    "lankColor":{
+        "master": "#ffe500",
+        "mage": "#df7b18",
+        "teacher": "#007aca",
+        "senior": "#3ace9a",
+        "junior": "#8653fa",
+        "sophomore": "#f387cb",
+        "freshman": "#c4e063",
+        "muggle": "#6ead76"
+    },
     "word": {
         "eng": {
             "인사": ["안녕하세요", "반갑습니다!", "환영해요!", "네,~~오늘은 기분이 좀 안좋은데...~~"]

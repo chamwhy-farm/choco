@@ -76,6 +76,11 @@ const getChoco = async (msg) => {
     chocoCtx.fillStyle = "#cccccc";
     chocoCtx.font = "50px sans-serif, segoe-ui-emoji";
     chocoCtx.fillText(usersChoco, 350, 210);
+    chocoCtx.save();
+    chocoCtx.arc(150, 150, 120, 0, Math.PI * 2, true);
+    chocoCtx.fillStyle = config.lankColor[user.getLank()];
+    chocoCtx.fill();
+    chocoCtx.fillStyle = "#cccccc";
     chocoCtx.beginPath();
 	// Start the arc to form a circle
 	chocoCtx.arc(150, 150, 110, 0, Math.PI * 2, true);
@@ -97,7 +102,7 @@ const getChoco = async (msg) => {
 };
 
 const getLv = async (msg) => {
-    const user = getUser(msg.author.id);
+    const user = await getUser(msg.author.id);
     const userLv = user.getLv();
     const lvCan = createCanvas(900, 300);
     const lvCtx = lvCan.getContext('2d');
@@ -117,4 +122,5 @@ async function getUser(userID){
 module.exports = {
     shop: shop,
     getChoco: getChoco,
+    getLv, getLv
 };
