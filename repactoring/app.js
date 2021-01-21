@@ -49,6 +49,33 @@ const User = require('./schemas/user');
 })();
 
 
+/* functions */
+
+//create
+function createUser(userID){
+    return User.create({userID: userID});
+}
+function createGuild(guildID){
+    return Guild.create({guildID: guildID});
+}
+
+//get
+function getUser(userID){
+    let userDB = User.findOne({userID: userID});
+    if(!userDB){
+        userDB = createUser(userID);
+    }
+    return userDB;
+}
+function getGuild(guildID){
+    let guildDB = Guild.findOne({guildID: guildID});
+    if(!guildDB){
+        guildDB = createGuild(guildID);
+    }
+    return guildDB;
+}
+
+
 
 //bots
 
@@ -62,6 +89,11 @@ client.on('message', async msg => {
     //초코 사용
     if(!util.isCall(msg)) return;
     
+    //mongoose load
+    const userDB = getUser(msg.author.id);
+    const guildDB = getGuild(msg.guild.id);
+
+
     //명령어
     const order = msg.content.split(' ');
 
@@ -110,7 +142,7 @@ client.on('message', async msg => {
         case 'attendance':
         case 'ㅊㅅ':
         case 'ct':
-            msg.reply(await attendanceRoute.attendance(msg, Discord.MessageAttachment));
+            msg.reply(await attRoute.attendance(msg, Discord.MessageAttachment));
             break;
 
         case '채널삭제':

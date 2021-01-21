@@ -1,10 +1,61 @@
-const askAddingProject = (msg, word) => {
+const util = require('../util');
+
+const setChMas = (msg, guildDB) => {
+    guildDB.chMas[msg.channel.id] = msg.author.id;
+    guildDB.save();
+};
+
+const isMas = (msg, guildDB) => {
+    if(util.isMaster(msg)) return true;
+
+    return guildDB.chMas[msg.channel.id] == msg.author.id;
+};
+
+const delCh = (msg, guildDB) => {
+    const word = msg.content.split(' ');
+    console.log(word);
+    if(word.length == 2){
+        msg.reply('5분 뒤에 이 채널은 삭제됩니다');
+        setTimeout(()=>{
+            msg.channel.delete()
+            .then(console.log)
+            .catch(console.error);
+        }, 5 * 60 * 1000);
+    }else{
+        const ms = util.getTime(word.slice(2));
+        if(!ms){
+            msg.reply('형식에 알맞게 입력해주세요');
+            console.log(ms);
+            return;
+        }
+        msg.reply(`${Math.round(ms/1000)}초 후에 이 채널은 삭제됩니다`);
+        setTimeout(()=>{
+            msg.channel.delete()
+            .then(console.log)
+            .catch(console.error);
+        }, ms);
+    }
+    delete guildDB.chMas[msg.channel.id];
+    guildDB.save();
+};
+
+
+const askAddingProject = (msg, userDB) => {
+    const word = msg.content.split(' ');
     if(!msg.member.roles.cache.find(r => r.name === "sophomore")){
         msg.reply("2학년인 sophomore부터 가능합니다");
         return;
     }
     if(word.length <= 2){
         msg.reply("작품의 이름을 작성해주세요");
+        return;
+    }
+    if(userDB.isUserProjecting()){
+        msg.reply('이미 작품을 진행중입니다!');
+        return;
+    }
+    if(userDB.projects.hasOwnProperty(word.slice(2))){
+        msg.reply('이미 같은 이름의 작품이 있습니다!');
         return;
     }
     let channelCategory;
@@ -32,6 +83,9 @@ const askAddingProject = (msg, word) => {
                     channel.setParent(channelCategory.id);
                 }).catch(console.error);
                 msg.reply('채널생성을 완료하였습니다');
+
+                userDB.projects[word.slice(2)] = false;
+                userDB.save();
             }
             else {
                 msg.reply('채널생성을 취소하였습니다');
@@ -43,6 +97,10 @@ const askAddingProject = (msg, word) => {
         });
 };
 
+
 module.exports = {
+    setChMas: setChMas,
+    isMas: isMas,
+    delCh: delCh,
     askAddingProject: askAddingProject
 }

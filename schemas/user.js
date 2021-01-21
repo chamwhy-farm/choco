@@ -19,6 +19,8 @@ const User = new Schema({
     },
     items: [{type: Number, default: 0}],
     attendance: [{type: Number},],
+    projects: {},
+    lastAns: {type: Number, default: -1},
     createdAt: {type: Date, default: Date.now }
 });
 
@@ -59,6 +61,19 @@ User.methods = {
         this.items[itemInfo.index] += cnt;
         this.choco -= itemInfo.price * cnt;
         return this.choco;
+    },
+    isUserProjecting: function(){
+        let projecting = false;
+        for(let i in this.projects){
+            if(!this.projects[i]){
+                projecting = true;
+                break;
+            }
+        }
+        return projecting;
+    },
+    answer: function(qaCnt){
+        this.lastAns = qaCnt;
     }
 };
 

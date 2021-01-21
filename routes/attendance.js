@@ -1,28 +1,23 @@
+
+
 const { createCanvas, loadImage } = require('canvas');
-const mongoose = require("mongoose");
-const bodyParser = require("body-parser");
 
 const moment = require("moment");
 const { isDate } = require('moment');
 
-const { createRoundBox, createUser } = require('../util');
 
-const User = require("../schemas/user");
 
 const config = require('../config.json');
+const util = require('../util');
 
 
 
 
-const attendanceUser = async (msg, word) => {
+const attendanceUser = async (msg, MsgAth) => {
     let answer = "";
-    let user = await User.findOne({userID: msg.author.id});
-    if(!user){
-        console.log("create new user! name: " + msg.author.username);
-        user = await createUser(msg.author.id);
-    }
+    let user = await util.getUser(msg.author.id);
+    
     if(user.attendance.indexOf(moment().startOf('day').toDate().getTime()) != -1){
-        
         answer = "이미 출석하셨습니다.";
     }else{
         //user 수정
@@ -30,14 +25,6 @@ const attendanceUser = async (msg, word) => {
         user.addChoco(50);
         user.save();
     }
-    console.log(user.attendance);
-
-    
-
-
-    console.log(user.attendance);
-    console.log(moment().startOf('day').toDate().getTime());
-    console.log(new Date());
     const canvas = createCanvas(720, 720);
     const ctx = canvas.getContext('2d');
     ctx.font = '30px Impact, segoe-ui-emoji';
@@ -85,17 +72,17 @@ const attendanceUser = async (msg, word) => {
                 }
             }
             
-            createRoundBox(ctx, 10, 80, 80, i*100+20, j*100+20+100, text, textColor);
+            util.createRoundBox(ctx, 10, 80, 80, i*100+20, j*100+20+100, text, textColor);
             
         }
     }
     if(answer == ""){
         answer = `${50}초코를 획득하셨습니다!`;
     }
-    return {attendanceCanvas: canvas, answer: answer};
+    return (answer, new MsgAth(canvas.toBuffer(), `${msg.author.username}.png`));
 };
 
 
 module.exports = {
     attendance: attendanceUser
-}
+};

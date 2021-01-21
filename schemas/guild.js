@@ -20,5 +20,16 @@ const Guild = new Schema({
         isPro: Boolean,
         promotion: Boolean
     },
+    chMas: [
+        {
+            channelName: {type: String},
+            master: {type: Number}
+        },
+    ],
+    qa:{
+        qaCnt: {type: Number, default: 0},
+        isQa: {type: Boolean, default: false}
+    }
+    
 });
 module.exports = mongoose.model("Guild", Guild);

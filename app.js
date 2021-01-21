@@ -1,210 +1,242 @@
 require('dotenv').config();
 
-const fs = require("fs");
-
 const Discord = require('discord.js');
 const client = new Discord.Client();
 const mongoose = require('mongoose');
-const join = require('path').join;
-const { createCanvas, loadImage } = require('canvas');
 
-const models = join(__dirname, 'app/models');
 
-const TOKEN = process.env.TOKEN;
+//상수
+const token = process.env.token;
+const password = process.env.password;
 
-require('./util');
-const config = require('./config.json');
-const { getLang, getWord, isMaster, createUser, getRandomInt } = require('./util');
-
-const muteRoute = require('./orders/mute');
-const attendanceRoute = require('./orders/attendance');
-const channelRoute = require('./orders/channels');
-const shopRoute = require('./orders/shop');
-const projectRoute = require('./orders/project');
-const questionRoute = require('./orders/question');
-
-const moduleUrl = './schemas';
-
-const Guild = require('./schemas/guild.js');
-const User = require('./schemas/user.js');
-const user = require('./schemas/user.js');
+//util modules 
 const util = require('./util');
-const { discriminator } = require('./schemas/guild.js');
+const fs = require('fs');
+const join = require('path').join;
+
+
+//data
+const config = require('./config.json');
+
+
+//routes
+const chocoRoute = require('./routes/choco');
+const muteRoute = require('./routes/mute');
+const attRoute = require('./routes/attendance');
+const chRoute = require('./routes/channels');
+const qaRoute = require('./routes/question');
+
+
+//mongoose schemas
+const Guile = require('./schemas/guild');
+const User = require('./schemas/user');
+const { cli } = require('winston/lib/winston/config');
+const user = require('./schemas/user');
+const choco = require('./routes/choco');
+
+//mongoose connect
+(()=>{
+    const db = mongoose.connection;
+    const url = `mongodb+srv://node:${password}@choco.vqljg.mongodb.net/choco?retryWrites=true&w=majority`;
+
+    db.on('error', console.error);
+    db.once('open', () => {
+        console.log('connected to mongoose server!');
+    });
+
+    mongoose.connect(url, {
+        keepAlive: true,
+        useNewUrlParser: true,
+        useUnifiedTopology: true
+    });
+})();
 
 
 
-const db = mongoose.connection;
-db.on('error', console.error);
-
-db.once('open', ()=>{
-  console.log('connect to mongoose server!');
-});
-const url = `mongodb+srv://node:${process.env.password}@choco.vqljg.mongodb.net/choco?retryWrites=true&w=majority`;
-
-mongoose.connect(url, {
-  keepAlive: true,
-  useNewUrlParser: true,
-  useUnifiedTopology: true
-});
-
-/*
-const MongoClient = require('mongodb').MongoClient;
-const uri = "mongodb+srv://chamwhy:<password>@cluster0.vqljg.mongodb.net/<dbname>?retryWrites=true&w=majority";
-const client = new MongoClient(uri, { useNewUrlParser: true });
-client.connect(err => {
-  const collection = client.db("test").collection("devices");
-  // perform actions on the collection object
-  client.close();
-});
-*/
 
 
 
-function isChocoUser(msg)
-{
-  User.findById
-}
 
-const invites = {};
-
-// A pretty useful method to create a delay without blocking the whole script.
-const wait = require('util').promisify(setTimeout);
-
-
-
+//시작
 client.on('ready', async () => {
-  // console.log(`Logged in as ${client.user.tag}!`);
-  // // "ready" isn't really ready. We need to wait a spell.
-  // await wait(1000);
-
-  // // Load all invites for all guilds and save them to the cache.
-  // client.guilds.cache.forEach(g => {
-  //   g.fetchInvites().then(guildInvites => {
-  //     invites[g.id] = guildInvites;
-  //   });
-  // });
-  console.log("문제 내줌");
-  await wait(getRandomInt(36000000, 144000000));
-});
-
-
-client.on('guildMemberAdd', async member => {
-  console.log('a user added');
-  member.guild.channels.cache.find(channel => channel.name === "대문").send("들어오셨습니다");
-  // To compare, we need to load the current invite list.
-  member.guild.fetchInvites().then(async (guildInvites) => {
-    // This is the *existing* invites for the guild.
-    const ei = invites[member.guild.id];
-    // Update the cached invites for the guild.
-    invites[member.guild.id] = guildInvites;
-    // Look through the invites, find the one for which the uses went up.
-    const invite = guildInvites.find(i => ei.get(i.code).uses < i.uses);
-    // This is just to simplify the message being sent below (inviter doesn't have a tag property)
-    const inviter = client.users.get(invite.inviter.id);
-    // Get the log channel (change to your liking)
-    const logChannel = member.guild.channels.cache.find(channel => channel.name === "대문");
-    if(!logChannel) return;
-    let user = await User.findOne({userID: inviter.id});
-    if(!user){
-        console.log("create new user! name: " + msg.author.username);
-        user = await createUser(msg.author.id);
+    const qaCh = client.channels.cache.find(c => c.name == '퀴즈');
+    async function askQuestion(){
+        await qaRoute.question(qaCh);
     }
-    user.addChoco(100);
-    // A real basic message with the information we need. 
-    logChannel.send(`환영합니다 ${member.user.tag}님. \`${inviter.tag} +100\``);
-  });
+    askQuestion();
+    setTimeout(async()=>{
+        await askQuestion();
+    }, util.getRandomInt(1000 * 3600 * 24, 1000 * 3600 * 24 * 4));
 });
 
 
 
+//메시지
 client.on('message', async msg => {
-  
+    //초코 사용
+    if(!util.isCall(msg)) return;
     const word = msg.content.split(' ');
-    let isCall = false;
-    for(let head in config.callName){
-      if(word[0].indexOf(config.callName[head]) != -1) isCall = true;
-    }
-    if(isCall){
-      isChocoUser(msg);
+    //mongoose load
+    const userDB = await util.getUser(msg.author.id);
+    const guildDB = await util.getGuild(msg.guild.id);
+    /* test */
+    guildDB.qa.qaCnt = 0;
+    guildDB.qa.isQa = true;
+    guildDB.save();
+    userDB.lastAns = -1;
+    userDB.save();
 
-      const lang = await getLang(msg.guild.id);
-      console.log(lang);
-    
-      switch(word[1]){
+    //명령어
+    const order = msg.content.split(' ');
+
+    switch(order[1]){
+
         case '안녕':
         case 'hello':
         case 'hi':
         case '헬로':
         case '하이':
         case '안녕하세요':
-          msg.reply("헤헤");
-          //msg.reply(getWord('인사', lang));
-          break;
+            msg.reply(util.getWord('인사'));
+            break;
 
         case "마스터":
         case "주인":
-          if(isMaster(msg)){
-            msg.reply("네, 주인님");
-          }else{
-            msg.reply("누구신가요?");
-          }
-          break;
+            if(util.isMaster(msg)){
+                msg.reply("네, 주인님");
+            }else{
+                msg.reply("누구신가요?");
+            }
+            break;
 
         case '링크':
         case 'link':
         case 'ㄹㅋ':
-          msg.reply('여기에 접속해서 서버에 초코를 추가할 수 있습니다\nhttps://bit.ly/34KXxCA');
-          break;
-        
+            msg.reply('');
+            break;
+
         case 'mute':
         case '뮤트':
         case 'ㅁㅌ':
         case '뮽':
-          muteRoute.mute(msg, word, client.users);
-          break;
+            muteRoute.mute(msg, client.users);
+            break;
 
         case 'unmute':
         case '언뮤트':
         case 'ㅇㅁㅌ':
         case '언뮽':
-          muteRoute.unmute(msg, word, client.users);
-          break;
-
+            muteRoute.unmute(msg, client.users);
+            break;
+        
         case '출석':
         case 'attend':
         case 'attendance':
         case 'ㅊㅅ':
         case 'ct':
-          const {attendanceCanvas, answer} = await attendanceRoute.attendance(msg, word);
-          if(attendanceCanvas == null) return;
-          const attachment = new Discord.MessageAttachment(attendanceCanvas.toBuffer(), 'attendance.png');
-	        msg.reply(answer, attachment);
-          break;
-        
-        case '채널삭제':
-        case '채삭':
-        case 'delCh':
-        case 'deleteChannel':
-          if(!isMaster(msg)){
-            msg.reply("권한이 없습니다");
-            return;
-          }
-          channelRoute.delCh(msg, word);
-          break;
+            msg.reply(await attRoute.attendance(msg, Discord.MessageAttachment));
+            break;
 
+        case "작품추가":
+        case "작품신청":
+        case "채널추가":
+        case "addProject":
+        case "채널신청":
+            chRoute.askAddingProject(msg, userDB);
+            break;
+
+        case "작품신청":
+        case "ㅈㅍㅅㅊ":
+            chRoute.addProject(msg);
+            break;
+
+        case "정답":
+        case "answer":
+        case "ㅈㄷ":
+        case "답":
+        case "해답":
+            if(!chRoute.isMas(msg, guildDB)){
+                msg.reply("일시적 점검 상태입니다");
+                return;
+            }
+            qaRoute.answer(msg, guildDB, userDB);
+            break;
+        
         case "초코양":
         case "초코":
         case "choco":
         case "cc":
-          const {chococan, chocotext} = await shopRoute.getChoco(msg);
-          const chocoment = new Discord.MessageAttachment(chococan.toBuffer(), `${msg.author.username}_choco.png`);
-          msg.reply(chocotext, chocoment);
-          break;
-          
-        case "작품신청":
-        case "ㅈㅍㅅㅊ":
-          projectRoute.askAddingProject(msg, word);
-          break;
+            msg.reply(chocoRoute.getChoco(msg, Discord.MessageAttachment));
+            break;
+
+        
+        /* master orders */
+        case "초코뺏어":
+            if(!util.isMaster(msg)){
+                msg.reply('권한이 없습니다');
+                return;
+            }
+            const minusChocoUser = util.getMention(client.users, word[2]);
+            const mUserDB = await util.getUser(minusChocoUser.id);
+            mUserDB.addChoco(-1* word[3]);
+            mUserDB.save();
+            break;
+
+        case "초코더해":
+            if(!util.isMaster(msg)){
+                msg.reply('권한이 없습니다');
+                return;
+            }
+            const plusChocoUser = util.getMention(client.users, word[2]);
+            const pUserDB = await util.getUser(plusChocoUser.id);
+            pUserDB.addChoco(word[3]);
+            pUserDB.save();
+            break;
+        
+        case '채마':
+        case '채널주인':
+        case '채널양도':
+        case 'channelMaster':
+        case 'chMas':
+            if(!util.isMaster(msg)){
+                msg.reply('권한이 없습니다');
+                return;
+            }
+            chRoute.setChMas(msg, guildDB);
+            break;
+
+        case '채널삭제':
+        case '채삭':
+        case 'delCh':
+        case 'deleteChannel':
+            if(!chRoute.isMas(msg, guildDB)){
+                msg.reply("권한이 없습니다");
+                return;
+            }
+            chRoute.delCh(msg, guildDB);
+            break;
+
+        case '랭킹업데이트':
+        case '랭업':
+        case 'lankUpdate':
+            if(!util.isMaster(msg)){
+                msg.reply('권한이 없습니다!');
+                return;
+            }
+            choco.lankingUpdate(msg);
+            break;
+
+
+
+
+
+
+
+
+
+
+
+
 
         // case "상점":
         // case "시장":
@@ -221,22 +253,22 @@ client.on('message', async msg => {
         //   msg.reply(`${itemName}을 구매했습니다`, buyment);
         //   break;
 
-        case "invite":
-        case "초대":
-        case "ㅊㄷ":
+        //   case "invite":
+        //   case "초대":
+        //   case "ㅊㄷ":
 
-          const invites = await msg.guild.fetchInvites();
-          console.log(invites);
-          invites.forEach(invite => {
-            const {uses, inviter} = invite;
-            const { username, discriminator } = inviter;
-            const name = `${username}#${discriminator}`;
-            console.log(invite);
-            // msg.reply(name, uses);
-          });
-          break;
-      }
+        //     const invites = await msg.guild.fetchInvites();
+        //     console.log(invites);
+        //     invites.forEach(invite => {
+        //       const {uses, inviter} = invite;
+        //       const { username, discriminator } = inviter;
+        //       const name = `${username}#${discriminator}`;
+        //       console.log(invite);
+        //       // msg.reply(name, uses);
+        //     });
+        //     break;
+        // }
     }
-});
-
-client.login(TOKEN);
+  });
+  
+  client.login(token);
