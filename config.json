@@ -22,6 +22,11 @@
         "freshman": "#c4e063",
         "muggle": "#6ead76"
     },
+    "lankPercent":{
+        "senior": 5,
+        "junior": 10,
+        "sophomore": 30
+    },
     "word": {
         "인사": ["안녕하세요", "반갑습니다!", "환영해요!", "네,~~오늘은 기분이 좀 안좋은데...~~"]       
     },

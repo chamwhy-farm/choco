@@ -1,5 +1,4 @@
 const mongoose = require("mongoose");
-const ObjectId = require("mongoose/lib/schema/objectid");
 const Schema = mongoose.Schema;
 
 const Guild = new Schema({
@@ -29,7 +28,25 @@ const Guild = new Schema({
     qa:{
         qaCnt: {type: Number, default: 0},
         isQa: {type: Boolean, default: false}
-    }
+    },
+    students: {}
     
 });
+
+Guild.methods = {
+    addChoco: function(choco, userID){
+        if(!this.students){
+            this.students = {};
+        }
+        this.students[userID] = choco;
+    },
+    getStudents: function(userIDList){
+        console.log(this.students, userIDList);
+        const students = this.students;
+        userIDList.sort(function (a, b) { 
+            return students[a] > students[b] ? -1 : students[a] < students[b] ? 1 : 0;  
+        });
+        return userIDList;
+    }
+};
 module.exports = mongoose.model("Guild", Guild);

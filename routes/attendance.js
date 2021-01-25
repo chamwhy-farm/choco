@@ -13,16 +13,16 @@ const util = require('../util');
 
 
 
-const attendanceUser = async (msg, MsgAth) => {
+const attendanceUser = async (msg, MsgAth, guildDB) => {
     let answer = "";
-    let user = await util.getUser(msg.author.id);
+    let user = await util.getUser(msg.author.id, msg.member);
     
     if(user.attendance.indexOf(moment().startOf('day').toDate().getTime()) != -1){
         answer = "이미 출석하셨습니다.";
     }else{
         //user 수정
         user.addAttend(moment().startOf('day').toDate().getTime());
-        user.addChoco(50);
+        user.addChoco(50, guildDB);
         user.save();
     }
     const canvas = createCanvas(720, 720);

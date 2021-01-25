@@ -23,18 +23,19 @@ const getWord = (word) => {
     return answerList[getRandomInt(0, answerList.length-1)];
 };
 
-const getUser = async (userID) => {
+const getUser = async (userID, member, guild) => {
     let user = await User.findOne({userID: userID});
     if(!user){
-        user = createUser(userID);
+        user = createUser(userID, member, guild);
     }
     return user;
 };
 
-const createUser = async (userID) => {
+const createUser = async (userID, member, guild) => {
     const newUser = new User({
         userID: userID
     });
+    await member.roles.add(guild.roles.cache.find(r => r.name == 'chocouser'));
     return await newUser.save().then(saveUser => {
         return saveUser;
     });
@@ -116,6 +117,31 @@ const createRoundBox = (ctx, r, w, h, x1, y1, text, textC) => {
     }
 };
 
+const sortObject = (obj) => {
+    let sortobj = [];
+    const returnObj = {};
+    for (let key in obj) {
+        sortobj.push([key, obj[key]]);
+    }
+    sortobj.sort(function(a, b) {
+        return a[1] - b[1];
+    });
+    for(let i in sortobj){
+        returnObj[i[0]] = i[1];
+    }
+    return returnObj;
+};
+
+const setGrade = (student, grades, gradeCnt) => {
+    for(let grade in grades){
+        if(grade == grades[gradeCnt]){
+            student.roles.add(grade);
+        }else{
+            student.roles.remove(grade);
+        }
+    }
+};
+
 module.exports = {
     isCall: isCall,
     isMaster: isMaster,
@@ -125,5 +151,7 @@ module.exports = {
     getTime: getTime,
     getMention: getMention,
     getRandomInt: getRandomInt,
-    createRoundBox: createRoundBox
+    createRoundBox: createRoundBox,
+    sortObject: sortObject,
+    setGrade: setGrade
 };

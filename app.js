@@ -33,6 +33,7 @@ const User = require('./schemas/user');
 const { cli } = require('winston/lib/winston/config');
 const user = require('./schemas/user');
 const choco = require('./routes/choco');
+const { getUser } = require('./util');
 
 //mongoose connect
 (()=>{
@@ -54,30 +55,51 @@ const choco = require('./routes/choco');
 
 
 
+const invites = {};
 
+const wait = require('util').promisify(setTimeout);
 
 
 //시작
 client.on('ready', async () => {
-    const qaCh = client.channels.cache.find(c => c.name == '퀴즈');
-    async function askQuestion(){
-        await qaRoute.question(qaCh);
-    }
-    askQuestion();
-    setTimeout(async()=>{
-        await askQuestion();
-    }, util.getRandomInt(1000 * 3600 * 24, 1000 * 3600 * 24 * 4));
+    await wait(1000);
+
+  // Load all invites for all guilds and save them to the cache.
+  client.guilds.cache.forEach(g => {
+    g.fetchInvites().then(guildInvites => {
+      invites[g.id] = guildInvites;
+    });
+  });
+});
+
+client.on('guildMemberAdd', member => {
+	
+    member.guild.fetchInvites().then(async guildInvites => {
+        const ei = invites[member.guild.id];
+        invites[member.guild.id] = guildInvites;
+        const invite = guildInvites.find(i => ei.get(i.code).uses < i.uses);
+        const inviter = client.users.cache.get(invite.inviter.id);
+        const inviterChoco = await util.getUser(inviter.id, inviter, member.guild);
+        const inviteGuild = await util.getGuild(member.guild.id);
+        inviterChoco.addChoco(500, inviteGuild);
+        inviterChoco.save();
+        const channel = member.guild.channels.cache.find(ch => ch.name === '대문');
+        if(!channel) return;
+        channel.send(`MHU서버에 오신걸 환영합니다, ${member.user.tag}! (${inviter.tag} 500초코 추가)`);
+    });
+	
 });
 
 
 
 //메시지
 client.on('message', async msg => {
+    const qaCh = msg.guild.channels.cache.find(ch => ch.name == '퀴즈');
     //초코 사용
     if(!util.isCall(msg)) return;
     const word = msg.content.split(' ');
     //mongoose load
-    const userDB = await util.getUser(msg.author.id);
+    const userDB = await util.getUser(msg.author.id, msg.member, msg.guild);
     const guildDB = await util.getGuild(msg.guild.id);
     /* test */
     guildDB.qa.qaCnt = 0;
@@ -90,6 +112,14 @@ client.on('message', async msg => {
     const order = msg.content.split(' ');
 
     switch(order[1]){
+
+        case '도움말':
+        case '도움':
+        case '도움!':
+        case 'help':
+        case 'ㄷㅇ':
+            msg.reply('아직 미완성이라 완성 후 추가하겠슴다!');
+            break;
 
         case '안녕':
         case 'hello':
@@ -134,7 +164,7 @@ client.on('message', async msg => {
         case 'attendance':
         case 'ㅊㅅ':
         case 'ct':
-            msg.reply(await attRoute.attendance(msg, Discord.MessageAttachment));
+            msg.reply(await attRoute.attendance(msg, Discord.MessageAttachment, guildDB));
             break;
 
         case "작품추가":
@@ -166,7 +196,16 @@ client.on('message', async msg => {
         case "초코":
         case "choco":
         case "cc":
-            msg.reply(chocoRoute.getChoco(msg, Discord.MessageAttachment));
+            const replayMsg = await chocoRoute.getChoco(msg, Discord.MessageAttachment, guildDB);
+            console.log(replayMsg);
+            msg.reply(replayMsg);
+            break;
+
+        case "랭킹":
+        case "lank":
+        case "랭크":
+        case "ㄹㅋ":
+            chocoRoute.lank(msg, guildDB);
             break;
 
         
@@ -177,9 +216,10 @@ client.on('message', async msg => {
                 return;
             }
             const minusChocoUser = util.getMention(client.users, word[2]);
-            const mUserDB = await util.getUser(minusChocoUser.id);
-            mUserDB.addChoco(-1* word[3]);
+            const mUserDB = await util.getUser(minusChocoUser.id, minusChocoUser, msg.guild);
+            mUserDB.addChoco(-1* word[3], guildDB);
             mUserDB.save();
+            msg.reply(`${minusChocoUser.username}에게 ${word[3]}만큼 초코를 뺏었습니다!`);
             break;
 
         case "초코더해":
@@ -188,9 +228,10 @@ client.on('message', async msg => {
                 return;
             }
             const plusChocoUser = util.getMention(client.users, word[2]);
-            const pUserDB = await util.getUser(plusChocoUser.id);
-            pUserDB.addChoco(word[3]);
+            const pUserDB = await util.getUser(plusChocoUser.id, plusChocoUser, msg.guild);
+            pUserDB.addChoco(word[3], guildDB);
             pUserDB.save();
+            msg.reply(`${plusChocoUser.username}에게 ${word[3]}만큼 초코를 지급했습니다!`);
             break;
         
         case '채마':
@@ -223,11 +264,28 @@ client.on('message', async msg => {
                 msg.reply('권한이 없습니다!');
                 return;
             }
-            choco.lankingUpdate(msg);
+            choco.lankingUpdate(msg, guildDB);
             break;
 
+        case '퀴즈':
+        case 'ㅋㅈ':
+            qaRoute.question(qaCh);
+            break;
 
-
+        case '길드초기화':
+            const chocoUsers = msg.guild.members.cache.filter(m => {
+                return m.roles.cache.find(r => r.name == 'chocouser');
+            });
+            const students = {};
+            for(let i of chocoUsers){
+                const chocouser = await getUser(i[1].user.id, i[1], msg.guild);
+                students[i[1].user.id] = chocouser.getChoco();
+            }
+            guildDB.students = students;
+            guildDB.save();
+            console.log(students);
+            msg.reply('초기화 완료하였습니다!');
+            break;
 
 
 

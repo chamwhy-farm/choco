@@ -7,8 +7,6 @@ const configjson = require("../config.json");
 
 const User = new Schema({
     userID: {type: String, required: true},
-    lv: {type: Number, required: true, default: 1},
-    lank: {type: String, required: true, default: "muggle"},
     choco: {
         choco: {type: Number, required: true, default: 1000},
         game: {
@@ -21,6 +19,7 @@ const User = new Schema({
     attendance: [{type: Number},],
     projects: {},
     lastAns: {type: Number, default: -1},
+    promotion: {type: Boolean, default: false},
     createdAt: {type: Date, default: Date.now }
 });
 
@@ -34,23 +33,12 @@ User.methods = {
         }
         return this.choco.lv;
     },
-    getLank: function(){
-        if(this.choco.lank == undefined){
-            const lankList = configjson.lank;
-            let key;
-            for(key in lankList){
-                if(lankList[key] != -1 && this.choco.lv > lankList[key]){
-                    break;
-                }
-            }
-            this.choco.lank = key;
-
-        }
-        return this.choco.lank;
-    },
-    addChoco: function(choco){
+    addChoco: function(choco, guildDB){
         this.choco.choco += choco * 1;
-        
+        if(this.choco.choco < 0){
+            this.choco.choco = 0;
+        }
+        guildDB.addChoco(this.choco.choco, this.userID);
     },
     addAttend: function(date){
         this.attendance.push(date);
