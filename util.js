@@ -74,20 +74,10 @@ const getTime = (word)=>{
     return ms;
 };
 
-const getMention = (users, mention) => {
-    if (!mention) return;
-  
-      if (mention.startsWith('<@') && mention.endsWith('>')) {
-          mention = mention.slice(2, -1);
-  
-          if (mention.startsWith('!')) {
-              mention = mention.slice(1);
-          }
-      const user = users.cache.get(mention);
-      if(!user) return;
-      console.log("user get success");
-          return user; 
-      }
+const getMention = (msg) => {
+    let user = msg.mentions.users.first();
+    if(!user) return;
+    return msg.guild.members.cache.find(u => u.id == user.id);
 };
 
 

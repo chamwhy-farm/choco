@@ -3,13 +3,13 @@ const util = require("../util.js");
 
 
 const muteUser = async (msg, users) => {
-    const word = msg.content.split(' ');
+    let word = msg.content.split(' ');
     word = word.slice(2); 
     if(word.length === 0){
         msg.reply("뮤트할 유저를 멘션해주세요");
         return;
     } 
-    const user = util.getMention(users, word[0]);
+    const user = util.getMention(msg);
     if(!user){
         msg.reply("형식에 알맞게 입력해주세욧"); 
         msg.reply("```"+word[0]+"```");
@@ -22,12 +22,12 @@ const muteUser = async (msg, users) => {
         await msg.guild.roles.create({
             data: {
                 name: "mute",
-                color: "red",
-                deny: ["SEND_MESSAGES"]
+                color: "RED",
             },
             reason: "mute user"
         });
         muteRole = msg.guild.roles.cache.find(role => role.name === "mute");
+        await msg.channel.overwritePermissions(muteRole, { 'SEND_MESSAGES': false }, "mute user");
     }
     if(word.length > 1){
         const ms = util.getTime(word.slice(1)); 
@@ -48,13 +48,13 @@ const muteUser = async (msg, users) => {
 };
 
 const unmuteUser = async (msg, users) => {
-    const word = msg.content.split(' ');
+    let word = msg.content.split(' ');
     word = word.slice(2); 
     if(word.length === 0){
         msg.reply("언뮤트할 유저를 멘션해주세요");
         return;
     } 
-    const user = util.getMention(users, word[0]);
+    const user = util.getMention(msg);
     if(!user){
         msg.reply("형식에 알맞게 입력해주세욧");
         msg.reply("```"+word[0]+"```");
@@ -71,6 +71,7 @@ const unmuteUser = async (msg, users) => {
             reason: "mute user"
         });
         muteRole = msg.guild.roles.cache.find(role => role.name === "mute");
+        await msg.channel.overwritePermissions(muteRole, { 'SEND_MESSAGES': false }, "mute user");
     }
     user.roles.remove(muteRole);
     msg.reply("언뮤트 완료하였습니다");

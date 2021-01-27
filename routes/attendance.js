@@ -15,7 +15,7 @@ const util = require('../util');
 
 const attendanceUser = async (msg, MsgAth, guildDB) => {
     let answer = "";
-    let user = await util.getUser(msg.author.id, msg.member);
+    let user = await util.getUser(msg.author.id, msg.member, msg.guild);
     
     if(user.attendance.indexOf(moment().startOf('day').toDate().getTime()) != -1){
         answer = "이미 출석하셨습니다.";

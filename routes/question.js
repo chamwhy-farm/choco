@@ -18,6 +18,7 @@ const question = async (qaCh) => {
     guildDB.save();
 };
 
+
 const answer = (msg, guildDB, userDB) => {
     const word = msg.content.split(' ');
     if(!guildDB.qa.isQa){
@@ -50,3 +51,5 @@ module.exports = {
     question: question,
     answer: answer
 }
+
+

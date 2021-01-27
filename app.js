@@ -164,7 +164,8 @@ client.on('message', async msg => {
         case 'attendance':
         case 'ㅊㅅ':
         case 'ct':
-            msg.reply(await attRoute.attendance(msg, Discord.MessageAttachment, guildDB));
+            msg.reply('2/1 부터 시작됩니다 초코 2.0');
+            //msg.reply(await attRoute.attendance(msg, Discord.MessageAttachment, guildDB));
             break;
 
         case "작품추가":
