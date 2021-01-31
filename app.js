@@ -91,9 +91,22 @@ client.on('guildMemberAdd', member => {
 });
 
 
+async function hongbo(msg){
+    if(msg.channel.name != '홍보') return;
+    if(util.isMaster(msg)) return;
+    const userDB = await util.getUser(msg.author.id, msg.member, msg.guild);
+    if(userDB.getChoco() < 1000){
+        msg.reply('초코가 부족합니다 (1000초코)\n - 5초 뒤 삭제될 예정입니다').then(m=>m.delete(5000));
+        msg.delete(5000);
+    }else{
+        userDB.addChoco(-1000);
+        userDB.save();
+    }
+}
 
 //메시지
 client.on('message', async msg => {
+    await hongbo(msg);
     const qaCh = msg.guild.channels.cache.find(ch => ch.name == '퀴즈');
     //초코 사용
     if(!util.isCall(msg)) return;
@@ -118,7 +131,7 @@ client.on('message', async msg => {
         case '도움!':
         case 'help':
         case 'ㄷㅇ':
-            msg.reply('아직 미완성이라 완성 후 추가하겠슴다!');
+            msg.reply({ embed: config.helpEmbed });
             break;
 
         case '안녕':
@@ -176,20 +189,16 @@ client.on('message', async msg => {
             chRoute.askAddingProject(msg, userDB);
             break;
 
-        case "작품신청":
-        case "ㅈㅍㅅㅊ":
-            chRoute.addProject(msg);
-            break;
 
         case "정답":
         case "answer":
         case "ㅈㄷ":
         case "답":
         case "해답":
-            if(!chRoute.isMas(msg, guildDB)){
-                msg.reply("일시적 점검 상태입니다");
-                return;
-            }
+            // if(!chRoute.isMas(msg, guildDB)){
+            //     msg.reply("일시적 점검 상태입니다");
+            //     return;
+            // }
             qaRoute.answer(msg, guildDB, userDB);
             break;
         
@@ -209,6 +218,10 @@ client.on('message', async msg => {
             chocoRoute.lank(msg, guildDB);
             break;
 
+            
+        case '홍보 신청':
+            
+
         
         /* master orders */
         case "초코뺏어":
@@ -216,7 +229,7 @@ client.on('message', async msg => {
                 msg.reply('권한이 없습니다');
                 return;
             }
-            const minusChocoUser = util.getMention(client.users, word[2]);
+            const minusChocoUser = util.getMention(msg);
             const mUserDB = await util.getUser(minusChocoUser.id, minusChocoUser, msg.guild);
             mUserDB.addChoco(-1* word[3], guildDB);
             mUserDB.save();
@@ -228,11 +241,12 @@ client.on('message', async msg => {
                 msg.reply('권한이 없습니다');
                 return;
             }
-            const plusChocoUser = util.getMention(client.users, word[2]);
-            const pUserDB = await util.getUser(plusChocoUser.id, plusChocoUser, msg.guild);
-            pUserDB.addChoco(word[3], guildDB);
+            const plusChocoUser = util.getMention(msg);
+            console.log(plusChocoUser);
+            const pUserDB = await util.getUser(plusChocoUser.user.id, plusChocoUser, msg.guild);
+            await pUserDB.addChoco(word[3], guildDB);
             pUserDB.save();
-            msg.reply(`${plusChocoUser.username}에게 ${word[3]}만큼 초코를 지급했습니다!`);
+            msg.reply(`${plusChocoUser.user.username}에게 ${word[3]}만큼 초코를 지급했습니다!`);
             break;
         
         case '채마':
@@ -265,7 +279,7 @@ client.on('message', async msg => {
                 msg.reply('권한이 없습니다!');
                 return;
             }
-            choco.lankingUpdate(msg, guildDB);
+            await choco.lankingUpdate(msg, guildDB);
             break;
 
         case '퀴즈':

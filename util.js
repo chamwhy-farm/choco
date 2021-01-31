@@ -76,7 +76,8 @@ const getTime = (word)=>{
 
 const getMention = (msg) => {
     let user = msg.mentions.users.first();
-    if(!user) return;
+    console.log(user);
+    if(!user) return null;
     return msg.guild.members.cache.find(u => u.id == user.id);
 };
 
@@ -122,12 +123,18 @@ const sortObject = (obj) => {
     return returnObj;
 };
 
-const setGrade = (student, grades, gradeCnt) => {
+const setGrade = async (student, grades, gradeCnt) => {
     for(let grade in grades){
-        if(grade == grades[gradeCnt]){
-            student.roles.add(grade);
+        console.log(grades[gradeCnt]);
+        const gradeId = grades[gradeCnt];
+        if(!gradeId){
+            await student.roles.remove(grades[grade]);
         }else{
-            student.roles.remove(grade);
+            if(grades[grade].id == grades[gradeCnt].id){
+                await student.roles.add(grades[grade]);
+            }else{
+                await student.roles.remove(grades[grade]);
+            }
         }
     }
 };

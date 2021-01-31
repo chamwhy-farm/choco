@@ -19,7 +19,6 @@ const User = new Schema({
     attendance: [{type: Number},],
     projects: {},
     lastAns: {type: Number, default: -1},
-    promotion: {type: Boolean, default: false},
     createdAt: {type: Date, default: Date.now }
 });
 

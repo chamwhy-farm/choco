@@ -44,6 +44,17 @@ Guild.methods = {
         console.log(this.students, userIDList);
         const students = this.students;
         userIDList.sort(function (a, b) { 
+            if(!students[a]){
+                if(!students[b]){
+                    return 0;
+                }else{
+                    return 1;
+                }
+            }else{
+                if(!students[b]){
+                    return -1;
+                }
+            }
             return students[a] > students[b] ? -1 : students[a] < students[b] ? 1 : 0;  
         });
         return userIDList;

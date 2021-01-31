@@ -4,7 +4,7 @@ const config = require('../config.json');
 
 
 const getChoco = async (msg, MsgAth, guildDB) => {
-    const user = await util.getUser(msg.author.id, msg.member);
+    const user = await util.getUser(msg.author.id, msg.member, msg.guild);
     console.log(user);
     const usersChoco = user.getChoco();
     const chocoCanvas = createCanvas(900, 300);
@@ -55,21 +55,20 @@ const getChoco = async (msg, MsgAth, guildDB) => {
     return (`초코는 상점에서 이용이 가능합니다`, new MsgAth(chocoCanvas.toBuffer(), `${msg.author.username}_attendance.png`));
 };
 
-const getChocoList = (msg, guildDB) => {
+const getChocoList = (msg, guildDB, roleName) => {
     const students = msg.guild.members.cache.filter(m => {
-        return m.roles.cache.find(r => r.name == 'chocouser');
+        return m.roles.cache.find(r => r.name == roleName);
     });
     const userIDList = [];
     for(let i of students){
         userIDList.push(i[1].user.id);
     }
-    console.log(userIDList);
     return [guildDB.getStudents(userIDList), students];
 };
 
 
-const lankingUpdate = (msg, guildDB) => {
-    const data = getChocoList(msg, guildDB);
+const lankingUpdate = async (msg, guildDB) => {
+    const data = getChocoList(msg, guildDB, "student");
     const chocoList = data[0];
     const students = data[1];
     const lankCnt = [0, 0, 0];
@@ -83,17 +82,22 @@ const lankingUpdate = (msg, guildDB) => {
     lankCnt[0] = Math.ceil(chocoList.length * config.lankPercent.senior / 100);
     lankCnt[1] = Math.ceil(chocoList.length * config.lankPercent.junior / 100);
     lankCnt[2] = Math.ceil(chocoList.length * config.lankPercent.sophomore / 100);
+    console.log(lankCnt);
     let lankInd = 0;
     let peopleCnt = 0;
     let list = '```\n';
     for(let i in chocoList){
         peopleCnt++;
         if(peopleCnt < 4){
-            students.get(i).roles.add(topRole);
+            students.get(chocoList[i]).roles.add(topRole);
         }
-        util.setGrade(students.get(i), roles, lankInd);
-        list += `${peopleCnt}.  ${students.get(chocoList[i]).nickname.padEnd(16, ' ')}  -  ${guildDB.students[chocoList[i]]}\n`;
-        if(!--lankCnt[lankInd]){
+        await util.setGrade(students.get(chocoList[i]), roles, lankInd); 
+        let name = students.get(chocoList[i]).nickname;
+        if(!name){
+            name = students.get(chocoList[i]).user.username;
+        }
+        list += `${peopleCnt}.  ${name}  -  ${guildDB.students[chocoList[i]]}\n`;
+        if(!(--lankCnt[lankInd])){
             lankInd++;
         }
     }
@@ -103,12 +107,11 @@ const lankingUpdate = (msg, guildDB) => {
 
 
 const lank = (msg, guildDB) => {
-    const data = getChocoList(msg, guildDB);
+    const data = getChocoList(msg, guildDB, "chocouser");
     const chocoList = data[0];
     const students = data[1];
     let list = '```\n';
     let peopleCnt = 0;
-    console.log(guildDB.students);
     for(let i in chocoList){
         peopleCnt++;
         let name = students.get(chocoList[i]).nickname;
@@ -122,24 +125,16 @@ const lank = (msg, guildDB) => {
 }
 
 
-const applyPromotion = (msg, userDB) => {
-    userDB.promotion = true;
-    userDB.save();
+const applyPromotion = (msg) => {
+    const hongboRole = msg.guild.roles.cache.find(r => r.name == 'hongbo');
+    msg.member.roles.add(hongboRole);
     msg.reply('홍보기능을 수락하셨습니다!');
 };
 
-const promotioning = (msg, userDB) => {
-    if(!userDB.promotion){
-        msg.reply('홍보 기능을 수락하셔야 사용할 수 있습니다. `초코야 홍보수락`');
-        return;
-    }
-
-};
 
 module.exports = {
     getChoco: getChoco,
     lankingUpdate: lankingUpdate,
     lank: lank,
     applyPromotion: applyPromotion,
-    promotioning: promotioning
 };
