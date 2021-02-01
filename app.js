@@ -104,7 +104,7 @@ client.on('message', async msg => {
     //초코 사용
     if(!util.isCall(msg)) return;
     const qaCh = msg.guild.channels.cache.find(ch => ch.name == '퀴즈');
-    
+
     const word = msg.content.split(' ');
     //mongoose load
     const userDB = await util.getUser(msg.author.id, msg.member, msg.guild);
@@ -208,7 +208,9 @@ client.on('message', async msg => {
             break;
 
             
-        case '홍보 신청':
+        case '홍보신청':
+        case 'ㅎㅂ':
+        case '홍보':
             await chocoRoute.applyPromotion(msg);
             break;
 
