@@ -108,10 +108,6 @@ client.on('message', async msg => {
     //mongoose load
     const userDB = await util.getUser(msg.author.id, msg.member, msg.guild);
     const guildDB = await util.getGuild(msg.guild.id);
-    console.log(userDB.getChoco());
-    userDB.addChoco(-1000, guildDB);
-    await userDB.save();
-    console.log(userDB.getChoco());
     
 
     //명령어
