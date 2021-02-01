@@ -3,8 +3,7 @@
 const qanda = require('../qanda.json');
 const util = require('../util');
 
-const question = async (qaCh) => {
-    const guildDB = await util.getGuild(qaCh.guild.id);
+const question = async (qaCh, guildDB) => {
     console.log(guildDB.qa.qaCnt);
     const problem = qanda.qa[guildDB.qa.qaCnt];
     if(!problem){

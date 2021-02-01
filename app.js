@@ -24,7 +24,6 @@ const muteRoute = require('./routes/mute');
 const attRoute = require('./routes/attendance');
 const chRoute = require('./routes/channels');
 const qaRoute = require('./routes/question');
-const guild = require('./schemas/guild');
 
 
 
@@ -89,7 +88,7 @@ async function hongbo(msg){
     if(util.isMaster(msg)) return;
     const userDB = await util.getUser(msg.author.id, msg.member, msg.guild);
     const guildDB = await util.getGuild(msg.guild.id);
-    if(userDB.getChoco() < 1000){
+    if(userDB.getChoco() < 2000){
         msg.reply('초코가 부족합니다 (1000초코)\n - 5초 뒤 삭제될 예정입니다').then(m=>m.delete(5000));
         msg.delete(5000);
     }else{
@@ -101,9 +100,11 @@ async function hongbo(msg){
 //메시지
 client.on('message', async msg => {
     await hongbo(msg);
-    const qaCh = msg.guild.channels.cache.find(ch => ch.name == '퀴즈');
+    
     //초코 사용
     if(!util.isCall(msg)) return;
+    const qaCh = msg.guild.channels.cache.find(ch => ch.name == '퀴즈');
+    
     const word = msg.content.split(' ');
     //mongoose load
     const userDB = await util.getUser(msg.author.id, msg.member, msg.guild);
@@ -166,8 +167,7 @@ client.on('message', async msg => {
         case 'attendance':
         case 'ㅊㅅ':
         case 'ct':
-            msg.reply('2/1 부터 시작됩니다 초코 2.0');
-            //msg.reply(await attRoute.attendance(msg, Discord.MessageAttachment, guildDB));
+            msg.reply(await attRoute.attendance(msg, Discord.MessageAttachment, guildDB));
             break;
 
         case "작품추가":
@@ -274,6 +274,10 @@ client.on('message', async msg => {
 
         case '퀴즈':
         case 'ㅋㅈ':
+            if(!util.isMaster(msg)){
+                msg.reply('권한이 없습니다!');
+                return;
+            }
             qaRoute.question(qaCh);
             break;
 
