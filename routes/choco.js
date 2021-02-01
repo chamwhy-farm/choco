@@ -133,10 +133,9 @@ const applyPromotion = async (msg) => {
     msg.reply('홍보기능을 수락하셨습니다!');
 };
 
-
 module.exports = {
     getChoco: getChoco,
     lankingUpdate: lankingUpdate,
     lank: lank,
-    applyPromotion: applyPromotion,
+    applyPromotion: applyPromotion
 };
