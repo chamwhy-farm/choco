@@ -8,7 +8,7 @@ const mongoose = require('mongoose');
 
 
 //상수
-const token = process.env.token;
+const token = process.env.TOKEN;
 const password = process.env.password;
 
 //util modules 
