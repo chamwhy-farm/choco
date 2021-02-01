@@ -38,13 +38,12 @@ const muteUser = async (msg, users) => {
             return;
         }
         console.log("nooooo\n" + user);
-        user.roles.add(muteRole);
-        setTimeout(()=>{
-            user.roles.remove(muteRole);
-            
+        await user.roles.add(muteRole);
+        await setTimeout(async ()=>{
+            await user.roles.remove(muteRole);
         }, ms);
     }else{
-        user.roles.add(muteRole);
+        await user.roles.add(muteRole);
     }
     msg.reply("뮤트 완료하였습니다");
 };
@@ -75,7 +74,7 @@ const unmuteUser = async (msg, users) => {
         muteRole = msg.guild.roles.cache.find(role => role.name === "mute");
         await msg.channel.overwritePermissions(muteRole, { 'SEND_MESSAGES': false }, "mute user");
     }
-    user.roles.remove(muteRole);
+    await user.roles.remove(muteRole);
     msg.reply("언뮤트 완료하였습니다");
 };
 

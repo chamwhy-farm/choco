@@ -2,9 +2,9 @@
 
 const util = require('../util');
 
-const setChMas = (msg, guildDB) => {
+const setChMas = async (msg, guildDB) => {
     guildDB.chMas[msg.channel.id] = msg.author.id;
-    guildDB.save();
+    await guildDB.save();
 };
 
 const isMas = (msg, guildDB) => {
@@ -13,7 +13,7 @@ const isMas = (msg, guildDB) => {
     return guildDB.chMas[msg.channel.id] == msg.author.id;
 };
 
-const delCh = (msg, guildDB) => {
+const delCh = async (msg, guildDB) => {
     const word = msg.content.split(' ');
     console.log(word);
     if(word.length == 2){
@@ -38,11 +38,11 @@ const delCh = (msg, guildDB) => {
         }, ms);
     }
     delete guildDB.chMas[msg.channel.id];
-    guildDB.save();
+    await guildDB.save();
 };
 
 
-const askAddingProject = (msg, userDB) => {
+const askAddingProject = (msg, userDB, guildDB) => {
     const word = msg.content.split(' ');
     if(!msg.member.roles.cache.find(r => r.name === "sophomore")){
         msg.reply("2학년인 sophomore부터 가능합니다");
@@ -83,11 +83,16 @@ const askAddingProject = (msg, userDB) => {
                 .then(channel => {
                     if (!channelCategory) throw new Error("Category channel does not exist");
                     channel.setParent(channelCategory.id);
+                    userDB.projects[word.slice(2)] = false;
+                    guildDB.chMas[channel.id] = msg.author.id;
+                    userDB.save().then(e => {
+                        guildDB.save().then(e => {
+                            msg.reply('채널생성을 완료하였습니다');
+                        });
+                    });
+                    
                 }).catch(console.error);
-                msg.reply('채널생성을 완료하였습니다');
-
-                userDB.projects[word.slice(2)] = false;
-                userDB.save();
+                
             }
             else {
                 msg.reply('채널생성을 취소하였습니다');

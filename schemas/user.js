@@ -37,7 +37,7 @@ User.methods = {
         if(this.choco.choco < 0){
             this.choco.choco = 0;
         }
-        guildDB.addChoco(this.choco.choco, this.userID);
+        guildDB.addChoco(this.choco.choco, this.userID); 
     },
     addAttend: function(date){
         this.attendance.push(date);

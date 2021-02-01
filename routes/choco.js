@@ -127,9 +127,9 @@ const lank = (msg, guildDB) => {
 }
 
 
-const applyPromotion = (msg) => {
+const applyPromotion = async (msg) => {
     const hongboRole = msg.guild.roles.cache.find(r => r.name == 'hongbo');
-    msg.member.roles.add(hongboRole);
+    await msg.member.roles.add(hongboRole);
     msg.reply('홍보기능을 수락하셨습니다!');
 };
 

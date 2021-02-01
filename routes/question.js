@@ -17,11 +17,11 @@ const question = async (qaCh) => {
     }
     qaCh.send(sendMsg);
     guildDB.qa.isQa = true;
-    guildDB.save();
+    await guildDB.save();
 };
 
 
-const answer = (msg, guildDB, userDB) => {
+const answer = async (msg, guildDB, userDB) => {
     const word = msg.content.split(' ');
     if(!guildDB.qa.isQa){
         msg.reply('문제가 없습니다!');
@@ -46,7 +46,7 @@ const answer = (msg, guildDB, userDB) => {
     }else{
         msg.reply('답이 틀립니다!');
     }
-    userDB.save();
+    await userDB.save();
 };
 
 module.exports = {

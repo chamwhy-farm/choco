@@ -24,6 +24,7 @@ const muteRoute = require('./routes/mute');
 const attRoute = require('./routes/attendance');
 const chRoute = require('./routes/channels');
 const qaRoute = require('./routes/question');
+const guild = require('./schemas/guild');
 
 
 
@@ -87,11 +88,12 @@ async function hongbo(msg){
     if(msg.channel.name != '홍보') return;
     if(util.isMaster(msg)) return;
     const userDB = await util.getUser(msg.author.id, msg.member, msg.guild);
+    const guildDB = await util.getGuild(msg.guild.id);
     if(userDB.getChoco() < 1000){
         msg.reply('초코가 부족합니다 (1000초코)\n - 5초 뒤 삭제될 예정입니다').then(m=>m.delete(5000));
         msg.delete(5000);
     }else{
-        userDB.addChoco(-1000);
+        userDB.addChoco(-2000, guildDB);
         userDB.save();
     }
 }
@@ -106,12 +108,11 @@ client.on('message', async msg => {
     //mongoose load
     const userDB = await util.getUser(msg.author.id, msg.member, msg.guild);
     const guildDB = await util.getGuild(msg.guild.id);
-    /* test */
-    guildDB.qa.qaCnt = 0;
-    guildDB.qa.isQa = true;
-    guildDB.save();
-    userDB.lastAns = -1;
-    userDB.save();
+    console.log(userDB.getChoco());
+    userDB.addChoco(-1000, guildDB);
+    await userDB.save();
+    console.log(userDB.getChoco());
+    
 
     //명령어
     const order = msg.content.split(' ');
@@ -178,7 +179,7 @@ client.on('message', async msg => {
         case "채널추가":
         case "addProject":
         case "채널신청":
-            chRoute.askAddingProject(msg, userDB);
+            chRoute.askAddingProject(msg, userDB, guildDB);
             break;
 
 
@@ -191,7 +192,7 @@ client.on('message', async msg => {
             //     msg.reply("일시적 점검 상태입니다");
             //     return;
             // }
-            qaRoute.answer(msg, guildDB, userDB);
+            await qaRoute.answer(msg, guildDB, userDB);
             break;
         
         case "초코양":
@@ -212,7 +213,8 @@ client.on('message', async msg => {
 
             
         case '홍보 신청':
-            
+            await chocoRoute.applyPromotion(msg);
+            break;
 
         
         /* master orders */
@@ -223,8 +225,8 @@ client.on('message', async msg => {
             }
             const minusChocoUser = util.getMention(msg);
             const mUserDB = await util.getUser(minusChocoUser.id, minusChocoUser, msg.guild);
-            mUserDB.addChoco(-1* word[3], guildDB);
-            mUserDB.save();
+            await mUserDB.addChoco(-1* word[3], guildDB);
+            await mUserDB.save();
             msg.reply(`${minusChocoUser.username}에게 ${word[3]}만큼 초코를 뺏었습니다!`);
             break;
 
@@ -237,7 +239,7 @@ client.on('message', async msg => {
             console.log(plusChocoUser);
             const pUserDB = await util.getUser(plusChocoUser.user.id, plusChocoUser, msg.guild);
             await pUserDB.addChoco(word[3], guildDB);
-            pUserDB.save();
+            await pUserDB.save();
             msg.reply(`${plusChocoUser.user.username}에게 ${word[3]}만큼 초코를 지급했습니다!`);
             break;
         
@@ -250,7 +252,7 @@ client.on('message', async msg => {
                 msg.reply('권한이 없습니다');
                 return;
             }
-            chRoute.setChMas(msg, guildDB);
+            await chRoute.setChMas(msg, guildDB);
             break;
 
         case '채널삭제':
@@ -261,7 +263,7 @@ client.on('message', async msg => {
                 msg.reply("권한이 없습니다");
                 return;
             }
-            chRoute.delCh(msg, guildDB);
+            await chRoute.delCh(msg, guildDB);
             break;
 
         case '랭킹업데이트':
@@ -289,7 +291,7 @@ client.on('message', async msg => {
                 students[i[1].user.id] = chocouser.getChoco();
             }
             guildDB.students = students;
-            guildDB.save();
+            await guildDB.save();
             console.log(students);
             msg.reply('초기화 완료하였습니다!');
             break;

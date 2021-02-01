@@ -23,7 +23,7 @@ const attendanceUser = async (msg, MsgAth, guildDB) => {
         //user 수정
         user.addAttend(moment().startOf('day').toDate().getTime());
         user.addChoco(50, guildDB);
-        user.save();
+        await user.save();
     }
     const canvas = createCanvas(720, 720);
     const ctx = canvas.getContext('2d');
