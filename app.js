@@ -1,3 +1,5 @@
+'use strict';
+
 require('dotenv').config();
 
 const Discord = require('discord.js');
@@ -11,9 +13,6 @@ const password = process.env.password;
 
 //util modules 
 const util = require('./util');
-const fs = require('fs');
-const join = require('path').join;
-
 
 //data
 const config = require('./config.json');
@@ -27,13 +26,6 @@ const chRoute = require('./routes/channels');
 const qaRoute = require('./routes/question');
 
 
-//mongoose schemas
-const Guile = require('./schemas/guild');
-const User = require('./schemas/user');
-const { cli } = require('winston/lib/winston/config');
-const user = require('./schemas/user');
-const choco = require('./routes/choco');
-const { getUser } = require('./util');
 
 //mongoose connect
 (()=>{

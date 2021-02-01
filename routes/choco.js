@@ -1,3 +1,5 @@
+'use strict';
+
 const { createCanvas, loadImage } = require('canvas');
 const util = require('../util');
 const config = require('../config.json');

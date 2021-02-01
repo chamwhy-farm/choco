@@ -1,3 +1,5 @@
+'use strict';
+
 const qanda = require('../qanda.json');
 const util = require('../util');
 
