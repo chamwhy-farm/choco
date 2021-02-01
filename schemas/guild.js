@@ -40,6 +40,15 @@ Guild.methods = {
         }
         this.students[userID] = choco;
     },
+    getQa: function(){
+        if(!this.qa){
+            this.qa = {
+                qaCnt: 0,
+                isQa: false
+            };
+        }
+        return this.qa;
+    },
     getStudents: function(userIDList){
         console.log(this.students, userIDList);
         const students = this.students;

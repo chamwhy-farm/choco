@@ -4,8 +4,7 @@ const qanda = require('../qanda.json');
 const util = require('../util');
 
 const question = async (qaCh, guildDB) => {
-    console.log(guildDB.qa.qaCnt);
-    const problem = qanda.qa[guildDB.qa.qaCnt];
+    const problem = qanda.qa[guildDB.getQa().qaCnt];
     if(!problem){
         console.log("문제가 없습니다!!!");
         return;
@@ -22,7 +21,7 @@ const question = async (qaCh, guildDB) => {
 
 const answer = async (msg, guildDB, userDB) => {
     const word = msg.content.split(' ');
-    if(!guildDB.qa.isQa){
+    if(!guildDB.getQa().isQa){
         msg.reply('문제가 없습니다!');
         return;
     }
