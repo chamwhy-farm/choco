@@ -280,7 +280,7 @@ client.on('message', async msg => {
                 msg.reply('권한이 없습니다!');
                 return;
             }
-            qaRoute.question(qaCh);
+            qaRoute.question(qaCh, guildDB);
             break;
 
         case '길드초기화':
@@ -289,7 +289,7 @@ client.on('message', async msg => {
             });
             const students = {};
             for(let i of chocoUsers){
-                const chocouser = await getUser(i[1].user.id, i[1], msg.guild);
+                const chocouser = await util.getUser(i[1].user.id, i[1], msg.guild);
                 students[i[1].user.id] = chocouser.getChoco();
             }
             guildDB.students = students;
