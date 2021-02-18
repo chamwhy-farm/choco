@@ -82,7 +82,40 @@ const attendanceUser = async (msg, MsgAth, guildDB) => {
     return (answer, new MsgAth(canvas.toBuffer(), `${msg.author.username}.png`));
 };
 
+const addGuildMember = async (channel, user, inviter, MsgAth) => {
+    const canvas = createCanvas(600, 140);
+    const ctx = canvas.getContext("2d");
+    ctx.fillStyle = "#1a1a1a";
+    util.createRoundBox(ctx, 20, 600, 140, 0, 0, null, null);
+    ctx.font = "bold 40px sans-serif, segoe-ui-emoji";
+    ctx.fillStyle = "white";
+    ctx.fillText(user.username, 140, 70);
+    ctx.fillStyle = "DarkGrey";
+    ctx.font = "20px sans-serif, segoe-ui-emoji";
+    ctx.fillText('has invited' + ((inviter == null) ? "!" : ` by ${inviter.tag}`), 142, 100);
+
+    ctx.beginPath();
+	// Start the arc to form a circle
+	ctx.arc(70, 70, 50, 0, Math.PI * 2, true);
+    ctx.arc(530, 70, 40, 0, Math.PI * 2, true);
+	// Put the pen down
+	ctx.closePath();
+	// Clip off the region you drew on
+	ctx.clip();
+
+    const avatar = await loadImage(user.displayAvatarURL({format: 'png'}));
+    ctx.drawImage(avatar, 20, 20, 100, 100);
+    ctx.restore();
+    if(inviter != null){
+        const inviterAvatar = await loadImage(inviter.displayAvatarURL({format: 'png'}));
+        ctx.drawImage(inviterAvatar, 490, 30, 80, 80);
+    }
+    
+    channel.send('MHU서버에 오신걸 환영합니다!!' + (inviter != null ? `  (${inviter.username} +500)` : ''), new MsgAth(canvas.toBuffer(), `${user.username}_added.png`));
+};
+
 
 module.exports = {
-    attendance: attendanceUser
+    attendance: attendanceUser,
+    addGuildMember: addGuildMember
 };

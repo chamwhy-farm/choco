@@ -77,7 +77,8 @@ client.on('guildMemberAdd', member => {
         inviterChoco.save();
         const channel = member.guild.channels.cache.find(ch => ch.name === '대문');
         if(!channel) return;
-        channel.send(`MHU서버에 오신걸 환영합니다, ${member.user.tag}! (${inviter.tag} 500초코 추가)`);
+        await attRoute.addGuildMember(channel, member.user, inviter, Discord.MessageAttachment);
+        // channel.send(`MHU서버에 오신걸 환영합니다, ${member.user.tag}! (${inviter.tag} 500초코 추가)`);
     });
 	
 });

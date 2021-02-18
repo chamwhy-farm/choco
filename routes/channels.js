@@ -45,8 +45,14 @@ const delCh = async (msg, guildDB) => {
 const askAddingProject = (msg, userDB, guildDB) => {
     const word = msg.content.split(' ');
     if(!msg.member.roles.cache.find(r => r.name === "sophomore")){
-        msg.reply("2학년인 sophomore부터 가능합니다");
-        return;
+        if(!msg.member.roles.cache.find(r => r.name === "junior")){
+            if(!msg.member.roles.cache.find(r => r.name === "senior")){
+                if(!msg.member.roles.cache.find(r => r.name === "teacher")){
+                    msg.reply("2학년인 sophomore부터 가능합니다");
+                    return;
+                }
+            }
+        }
     }
     if(word.length <= 2){
         msg.reply("작품의 이름을 작성해주세요");
