@@ -35,6 +35,9 @@ const createUser = async (userID, member, guild) => {
     const newUser = new User({
         userID: userID
     });
+    const guildDB = await getGuild(guild.id);
+    guildDB.student[userID] = 1000;
+    await guildDB.save();
     await member.roles.add(guild.roles.cache.find(r => r.name == 'chocouser'));
     return await newUser.save().then(saveUser => {
         return saveUser;
